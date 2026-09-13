@@ -1,0 +1,13 @@
+[project]
+name = "cpython-heads-seed"
+version = "1.0.0"
+description = "Educational CPython MT19937 seed post-selection demonstration"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { file = "LICENSE" }
+authors = [{ name = "Project contributors" }]
+dependencies = []
+
+[tool.ruff]
+line-length = 88
+target-version = "py39"

@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*$py.class
+
+.venv/
+venv/
+env/
+
+.coverage
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+.DS_Store
+*.swp
+*~
+
+# Ad-hoc generated seeds; keep the two documented fixtures tracked.
+seed_*_heads.txt
+!seed_100_heads.txt
+!seed_1000_heads.txt
