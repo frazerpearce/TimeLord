@@ -5,7 +5,9 @@ description = "Educational CPython MT19937 seed post-selection demonstration"
 readme = "README.md"
 requires-python = ">=3.9"
 license = { file = "LICENSE" }
-authors = [{ name = "Project contributors" }]
+authors = [
+    { name = "Frazer Pearce", email = "frazer.pearce@nottingham.ac.uk" },
+]
 dependencies = []
 
 [tool.ruff]
