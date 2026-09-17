@@ -262,6 +262,69 @@ The unusual step occurred earlier, when the seed was selected.
 
 ---
 
+# Make the random program write a message
+
+```bash
+python3 find_text_seed.py "THE FUTURE IS ALREADY WRITTEN."
+python3 demo_text.py
+```
+
+The demo prints `THE FUTURE IS ALREADY WRITTEN.` using only an ordinary
+`random.Random(seed)` and successive `chr(r.randrange(128))` calls.
+Hand someone just `demo_text.py` and `seed_text.txt`: the file contains only
+a hexadecimal integer (`0x...`), just like the heads seed files. No message
+length is stored or known by the demo. The constructor appends ASCII 30 and 31
+(record separator and unit separator); the demo stops at this pair without
+printing it, then prints a final newline. A one-character buffer keeps the
+terminator out of the output. Individual control characters remain supported,
+but the consecutive pair `\x1e\x1f` is reserved and rejected in input.
+
+Coin tossing constrains the future to one of two symbols. Text generation
+uses a larger alphabet. For 128-character ASCII, CPython's `randrange(128)`
+requests **eight** bits (`128.bit_length()` is 8), rejecting values at least
+128. `getrandbits(8)` takes bits 31 through 24 of a tempered MT19937 word,
+most significant bit first. Constraining these to the desired ASCII value
+makes every draw accepted immediately: eight equations per character.
+This behavior is checked against the installed CPython in the tests.
+
+```text
+choose a message
+       ↓
+construct its required future MT outputs
+       ↓
+solve backwards for the state
+       ↓
+construct an ordinary Python integer seed
+       ↓
+give that seed to an otherwise trivial Python program
+       ↓
+the "random" program writes the chosen message
+```
+
+Both constructors share the original GF(2) solver and reverse integer-seeding
+machinery in `timelord_mt.py`. Free state bits retain random values; use
+`--free-seed 42` for reproducible construction. Seeds are saved in hexadecimal;
+`--show-seed` optionally prints the large integer. Diagnostics report constraint
+count, achieved rank, remaining free bits, seed size, timing and verification.
+
+Only ASCII values 0..127 are accepted. For control characters, use
+`python3 find_text_seed.py --file message.bin`; the file is read as raw bytes
+with no encoding or newline conversion. Empty input is supported too.
+
+Capacity is determined by constraint consistency, not a hard-coded message
+length. The two terminator characters add 16 constraints. On CPython 3.9.6,
+a repeated `The future is already written. ` prefix of 2490 message characters
+plus the terminator verified at rank 19,936 with no free state bits. A prefix
+of 2491 message characters plus the terminator was inconsistent. This is a
+measured boundary for that message, not a guaranteed maximum: dependent but
+consistent constraints are accepted, and failure reports the rank achieved
+before the contradiction.
+
+MT19937 is an established generator; this demonstration extends the existing
+seed construction to text. It is not suitable for cryptographic use.
+
+---
+
 # Reproducible construction
 
 By default, TimeLord fills the unconstrained parts of the MT19937 state using operating-system entropy.
