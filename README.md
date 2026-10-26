@@ -325,6 +325,55 @@ seed construction to text. It is not suitable for cryptographic use.
 
 ---
 
+# Unfold a planet from one seed
+
+```bash
+python3 timelord_planet.py
+```
+
+Hand someone just [`timelord_planet.py`](timelord_planet.py) and
+[`seed_planet.txt`](seed_planet.txt), or the
+[standalone delivery ZIP](experiments/timelord_planet/artifacts/timelord-planet.zip).
+The script uses ordinary `random.Random(integer_seed)` followed by successive
+`getrandbits(8)` calls to recover a complete offline HTML/WebGL planet, then opens
+it in a browser. No third-party Python packages are required.
+
+**Leave the mouse and trackpad untouched for the first five seconds.** The quiet
+local landscape then unfolds into a globe, rotates to another location, zooms
+back in, and returns to the identical original view over a 40-second loop.
+Dragging or scrolling pauses automation; click the picture and press **Space**
+to restart. Safari 26.6.2 was confirmed working; automated render checks use
+Chromium 151, with an additional WebKit 26.5 startup/resume check.
+
+```bash
+# Reconstruct without opening a browser:
+python3 timelord_planet.py --no-open --output planet.html
+```
+
+The complete transported frame is **2,463 bytes**, including its two-byte length,
+HTML, unpacking invocation, terrain, shaders and camera loop. The physical
+TimeLord integer occupies **19,966 bits / 2,496 binary bytes** (4,995 bytes as
+hexadecimal text); the 2,492-byte information capacity is a different measure.
+The default procedural **world identity is unsigned 32-bit `1`**, already inside
+the transported program. It is distinct from the large transport seed.
+
+This is procedural packing on a declared browser/WebGL host, not compiler
+bootstrapping or CPU/OS-only self-containment. The browser supplies standard Web
+APIs and gzip decompression. There are no runtime assets or network requests.
+Terrain is shaded on a sphere with finite detail; the automatic reveal spans
+48x magnification and exploration supports a tested 200x range. Exact return
+pixels were verified on the same backend; cross-GPU identity is not claimed.
+
+See the [planet report](experiments/timelord_planet/README.md) for readable source,
+reproducible construction, integration hooks, size accounting and automated
+checks. View [A](experiments/timelord_planet/artifacts/A.png),
+[the globe](experiments/timelord_planet/artifacts/globe.png),
+[B](experiments/timelord_planet/artifacts/B.png), or the
+[complete loop video](experiments/timelord_planet/artifacts/loop.mp4).
+The original heads and text demonstrations are unchanged.
+
+---
+
 # Reproducible construction
 
 By default, TimeLord fills the unconstrained parts of the MT19937 state using operating-system entropy.

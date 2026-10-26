@@ -1,0 +1,20 @@
+{
+  "raw_source_bytes": 3905,
+  "minified_bytes": 3320,
+  "gzip_bytes": 1722,
+  "base64_bytes": 2296,
+  "html_wrapper_bytes": 165,
+  "packed_payload_bytes": 2461,
+  "framing_bytes": 2,
+  "total_framed_bytes": 2463,
+  "limit_bytes": 2492,
+  "payload_sha256": "858f7e4799630ec7cc3346b4f62010cceb1456291044be43a9eb1f4c8c3509e7",
+  "seed_bits": 19966,
+  "seed_binary_bytes": 2496,
+  "seed_hex_file_bytes": 4995,
+  "constraint_rank": 19704,
+  "free_state_bits": 232,
+  "host": "Browser with WebGL1, OES_standard_derivatives, highp fragment floats, DecompressionStream(gzip), Blob/Response, standard DOM; not CPU/OS-only",
+  "python_version": "3.9.6",
+  "loader_bytes": 344
+}

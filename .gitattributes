@@ -2,3 +2,6 @@
 *.py text eol=lf
 *.md text eol=lf
 *.txt text eol=lf
+experiments/timelord_planet/artifacts/frame.bin binary
+# Preserve the vendored upstream file, including its final blank line.
+experiments/timelord_planet/vendor/timelord_mt.py whitespace=-blank-at-eof

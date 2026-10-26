@@ -1,0 +1,11 @@
+{
+  "generator": "timelord_planet_v1",
+  "world_seed": 1,
+  "world_seed_convention": "unsigned 32-bit integer",
+  "initial_view": {"longitude": 0.4, "latitude": 0.3, "z": 0.025},
+  "loop_seconds": 40,
+  "transport_seed_file": "seed_planet.txt",
+  "transport_framed_bytes": 2463,
+  "payload_sha256": "858f7e4799630ec7cc3346b4f62010cceb1456291044be43a9eb1f4c8c3509e7",
+  "note": "Delivery metadata only. The identical world and camera constants are already in the transported program; this file supplies no runtime code or data."
+}

@@ -1,0 +1,10 @@
+{
+  "exact_cpython_getrandbits_reconstruction": true,
+  "reproducible_build": true,
+  "address_vectors_pass": true,
+  "total_framed_bytes": 2463,
+  "limit_pass": true,
+  "clean_isolated_loader": true,
+  "packed_sha256": "858f7e4799630ec7cc3346b4f62010cceb1456291044be43a9eb1f4c8c3509e7",
+  "seed_bits": 19966
+}
