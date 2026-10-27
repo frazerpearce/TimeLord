@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 """Magrathea: recover a complete offline planet from a TimeLord integer.
 
-This generic loader supplies no graphics, decompression, terrain or camera code.
+This generic loader supplies gzip decompression, but no graphics, terrain or camera code.
 Deliver this script with seed_planet.txt; all application logic is in the seed.
 """
 import argparse
 import hashlib
+import gzip
 from pathlib import Path
 import random
 import tempfile
@@ -13,7 +14,7 @@ import webbrowser
 
 
 def reconstruct(seed_path):
-    """Decode a two-byte little-endian length and successive CPython bytes."""
+    """Decode the binary frame and decompress its complete HTML document."""
     seed = int(Path(seed_path).read_text(encoding="ascii").strip(), 0)
     if seed < 0:
         raise ValueError("expected a nonnegative integer seed")
@@ -21,7 +22,7 @@ def reconstruct(seed_path):
     length = rng.getrandbits(8) | (rng.getrandbits(8) << 8)
     if not 0 < length <= 2490:
         raise ValueError("invalid TimeLord binary frame length")
-    return bytes(rng.getrandbits(8) for _ in range(length))
+    return gzip.decompress(bytes(rng.getrandbits(8) for _ in range(length)))
 
 
 def main():
@@ -34,15 +35,15 @@ def main():
     args = parser.parse_args()
     try:
         document = reconstruct(args.seed)
-    except (OSError, ValueError) as error:
+    except (OSError, ValueError, EOFError) as error:
         parser.error(str(error))
     output = args.output or Path(tempfile.mkdtemp(prefix="timelord-planet-")) / "planet.html"
     output = output.expanduser().resolve()
     output.write_bytes(document)
-    print("Recovered: {} ({} bytes; {} framed bytes)".format(output, len(document), len(document) + 2))
+    print("Recovered: {} ({} HTML bytes)".format(output, len(document)))
     print("SHA-256: " + hashlib.sha256(document).hexdigest())
     print("The opening view holds for 5 seconds. Leave the trackpad/mouse untouched.")
-    print("Drag/scroll pauses the loop; click the picture and press Space to restart.")
+    print("After the film, the camera orbits. Drag/scroll pauses the camera; Space resets film and weather.")
     if not args.no_open and not webbrowser.open(output.as_uri()):
         print("Open this file in a WebGL browser: " + output.as_uri())
     return output

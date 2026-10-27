@@ -2,9 +2,15 @@
   "exact_cpython_getrandbits_reconstruction": true,
   "reproducible_build": true,
   "address_vectors_pass": true,
-  "total_framed_bytes": 2463,
+  "unchanged_terrain_generator": true,
+  "total_framed_bytes": 2050,
   "limit_pass": true,
-  "clean_isolated_loader": true,
-  "packed_sha256": "858f7e4799630ec7cc3346b4f62010cceb1456291044be43a9eb1f4c8c3509e7",
-  "seed_bits": 19966
+  "clean_isolated_loaders": [
+    "minimal",
+    "normal",
+    "stripped"
+  ],
+  "html_sha256": "ce595d85c71a128e76387a5ba7199178a4cf6caf361cbc12a0315ec851bf37c0",
+  "packed_sha256": "b960b5fa23e0881bdc9dc3fc9e467aa8457707173592926bc06e4020f1d4ea9c",
+  "seed_bits": 19964
 }

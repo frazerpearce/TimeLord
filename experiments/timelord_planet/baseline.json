@@ -1,0 +1,10 @@
+{
+  "commit": "31914fa",
+  "framed_bytes": 2463,
+  "terrain_functions_sha256": {
+    "H": "83c81eb36ad8d22e8289e816615cb593e15334260741a0e3831739100aa199f6",
+    "N": "bf08ca8f9e2f44c2ae509be3b0d923228a08b6757d216168149d7fb6aec690ba",
+    "terrain": "cc62f077878b9d7bc634362dcc551adf3e698e6b0debc193cce8c2708b9df571"
+  },
+  "new_transport_old_scene_frame_bytes": 1740
+}

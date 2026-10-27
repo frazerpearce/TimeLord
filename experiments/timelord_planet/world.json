@@ -1,11 +1,22 @@
 {
-  "generator": "timelord_planet_v1",
+  "generator": "magrathea_v2",
   "world_seed": 1,
   "world_seed_convention": "unsigned 32-bit integer",
-  "initial_view": {"longitude": 0.4, "latitude": 0.3, "z": 0.025},
-  "loop_seconds": 40,
+  "initial_view": {
+    "longitude": 0.4,
+    "latitude": 0.3,
+    "z": 0.025
+  },
   "transport_seed_file": "seed_planet.txt",
-  "transport_framed_bytes": 2463,
-  "payload_sha256": "858f7e4799630ec7cc3346b4f62010cceb1456291044be43a9eb1f4c8c3509e7",
-  "note": "Delivery metadata only. The identical world and camera constants are already in the transported program; this file supplies no runtime code or data."
+  "transport_framed_bytes": 2050,
+  "payload_sha256": "b960b5fa23e0881bdc9dc3fc9e467aa8457707173592926bc06e4020f1d4ea9c",
+  "note": "Delivery metadata only. The identical world and camera constants are already in the transported program; this file supplies no runtime code or data.",
+  "film_seconds": 40,
+  "returned_hold_seconds": 3,
+  "globe_reveal_complete_seconds": 48,
+  "steady_orbit_start_seconds": 52,
+  "orbit_speed_radians_per_second": 0.08,
+  "transport": "uint16_le length + gzip-compressed complete HTML",
+  "html_sha256": "ce595d85c71a128e76387a5ba7199178a4cf6caf361cbc12a0315ec851bf37c0",
+  "weather_time": "Continuous elapsed seconds; Space explicitly resets to zero."
 }

@@ -1,0 +1,31 @@
+{
+  "frame_bytes": 2050,
+  "limit_bytes": 2492,
+  "original_timelord_tests_passed": 15,
+  "delivery_tests_passed": 4,
+  "reconstructed_offline_browsers": [
+    {
+      "engine": "chromium",
+      "browser": "151.0.7922.34",
+      "renderer": "ANGLE (Google, Vulkan 1.3.0 (SwiftShader Device (LLVM 10.0.0) (0x0000C0DE)), SwiftShader driver)",
+      "network_protection": "browser offline"
+    },
+    {
+      "engine": "webkit",
+      "browser": "26.5",
+      "renderer": "Apple GPU",
+      "network_protection": "HTTP(S) routes aborted"
+    }
+  ],
+  "exact_ground_endpoint_pixels": true,
+  "terrain_generator_unchanged": true,
+  "clouds_deterministic_and_evolving": true,
+  "orbit_continuous_and_sustained": true,
+  "reference_reports": [
+    "transport-verification.json",
+    "browser-verification.json",
+    "webkit-verification.json",
+    "delivery.json",
+    "media.json"
+  ]
+}

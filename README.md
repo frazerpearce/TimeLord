@@ -335,55 +335,64 @@ seed construction to text. It is not suitable for cryptographic use.
 python3 timelord_planet.py
 ```
 
-Magrathea is the procedural planet-building strand of TimeLord.
+Magrathea is TimeLord's procedural planet-building strand. Give someone just
+[`timelord_planet.py`](timelord_planet.py) and [`seed_planet.txt`](seed_planet.txt),
+or the [normal ZIP](experiments/timelord_planet/artifacts/magrathea.zip).
+A [stripped ZIP](experiments/timelord_planet/artifacts/magrathea-stripped.zip)
+contains exactly two files: the same integer seed and a six-line, 287-byte
+launcher, with no checks, comments, argument parsing or status output. Extract
+it, enter its directory, and run `python3 timelord_planet.py`.
 
-Hand someone just [`timelord_planet.py`](timelord_planet.py) and
-[`seed_planet.txt`](seed_planet.txt), or the
-[standalone delivery ZIP](experiments/timelord_planet/artifacts/magrathea.zip).
-The script uses ordinary `random.Random(integer_seed)` followed by successive
-`getrandbits(8)` calls to recover a complete offline HTML/WebGL planet, then opens
-it in a browser. No third-party Python packages are required.
+The original 40-second film holds at A, reveals the globe, visits B and returns
+to exactly the original ground/camera state. Procedural clouds move and evolve
+throughout. After a three-second return hold, the camera reveals the globe and
+smoothly enters a continuing steady orbit; it does not restart automatically.
 
-A separate [stripped ZIP](experiments/timelord_planet/artifacts/magrathea-stripped.zip)
-contains exactly two files: the same integer seed and a six-line Python launcher.
-It only imports the standard modules, reconstructs bytes, writes `planet.html`
-and opens it. No checks, comments, command-line parsing or status output.
-Extract it, change into the extracted directory, and run `python3 timelord_planet.py`.
-This strips the launcher; it still uses an installed CPython interpreter.
-
-**Leave the mouse and trackpad untouched for the first five seconds.** The quiet
-local landscape then unfolds into a globe, rotates to another location, zooms
-back in, and returns to the identical original view over a 40-second loop.
-Dragging or scrolling pauses automation; click the picture and press **Space**
-to restart. Safari 26.6.2 was confirmed working; automated render checks use
-Chromium 151, with an additional WebKit 26.5 startup/resume check.
+**Leave the mouse/trackpad untouched to watch.** Dragging or scrolling pauses
+only the camera, while weather continues. Click the picture and press **Space**
+to reset the film and cloud clock to zero. Other keys do not restart it.
 
 ```bash
-# Reconstruct without opening a browser:
 python3 timelord_planet.py --no-open --output planet.html
 ```
 
-The complete transported frame is **2,463 bytes**, including its two-byte length,
-HTML, unpacking invocation, terrain, shaders and camera loop. The physical
-TimeLord integer occupies **19,966 bits / 2,496 binary bytes** (4,995 bytes as
-hexadecimal text); the 2,492-byte information capacity is a different measure.
-The default procedural **world identity is unsigned 32-bit `1`**, already inside
-the transported program. It is distinct from the large transport seed.
+The seed is consumed by actual `random.Random(integer_seed)` and successive
+`getrandbits(8)` calls. It recovers a binary gzip stream containing the complete
+HTML/WebGL application; Python's standard `gzip` module decompresses it before
+writing/opening HTML. No third-party Python packages or runtime network access.
+Use a matching seed and launcher: the older loader expected direct HTML.
+Existing download paths remain supported; version 1 is preserved at commit
+`31914fa`.
 
-This is procedural packing on a declared browser/WebGL host, not compiler
-bootstrapping or CPU/OS-only self-containment. The browser supplies standard Web
-APIs and gzip decompression. There are no runtime assets or network requests.
-Terrain is shaded on a sphere with finite detail; the automatic reveal spans
-48x magnification and exploration supports a tested 200x range. Exact return
-pixels were verified on the same backend; cross-GPU identity is not claimed.
+The complete framed payload is **2,050 bytes**, including its two-byte length
+and gzip header/trailer—413 bytes less than the previous base64-in-HTML version,
+even with clouds and the orbit added. It expands to **4,250 HTML bytes**. The
+physical transport integer is **19,964 bits / 2,496 binary bytes**, or 4,994 bytes
+as hexadecimal text. The generated world's unsigned 32-bit identity is `1`,
+which is distinct from the large TimeLord transport seed.
 
-See the [planet report](experiments/timelord_planet/README.md) for readable source,
-reproducible construction, integration hooks, size accounting and automated
-checks. View [A](experiments/timelord_planet/artifacts/A.png),
+CPython and its standard gzip decoder are declared loading infrastructure;
+the browser supplies WebGL, high-precision fragment floats, standard derivatives
+and DOM APIs. All bespoke terrain, clouds, shaders, controls and camera logic
+are in the compressed document. This is not CPU/OS-only self-containment.
+Terrain is shaded on a sphere and clouds use a separate thin shell. Detail is
+finite, with a 48x film reveal and tested 200x exploration range.
+
+Chromium 151 and WebKit 26.5 checks verify exact ground-only return frames,
+continuous evolving weather, sustained orbital motion, six seeds, eight fixed
+locations and both recipient distributions. WebKit's network requests are
+blocked by routes because its offline switch rejects local files on this host.
+Fields and pixels are deterministic on a given backend; cross-GPU identity is
+not promised. The original heads/text demonstrations are unchanged.
+
+See the [Magrathea report](experiments/timelord_planet/README.md) for readable
+source, reproduction commands, accounting, integration and limitations. View
+[A](experiments/timelord_planet/artifacts/A.png),
 [the globe](experiments/timelord_planet/artifacts/globe.png),
-[B](experiments/timelord_planet/artifacts/B.png), or the
-[complete loop video](experiments/timelord_planet/artifacts/loop.mp4).
-The original heads and text demonstrations are unchanged.
+[B](experiments/timelord_planet/artifacts/B.png),
+[returned A with later clouds](experiments/timelord_planet/artifacts/A-return.png),
+[steady orbit](experiments/timelord_planet/artifacts/orbit.png), or the
+[70-second film-to-orbit video](experiments/timelord_planet/artifacts/loop.mp4).
 
 ---
 

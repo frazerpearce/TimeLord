@@ -1,0 +1,20 @@
+{
+  "programs": [],
+  "stream_groups": [],
+  "streams": [
+    {
+      "width": 960,
+      "height": 640,
+      "r_frame_rate": "12/1",
+      "nb_frames": "840"
+    }
+  ],
+  "format": {
+    "duration": "70.000000",
+    "size": "12868789"
+  },
+  "world_seed": 1,
+  "html_sha256": "ce595d85c71a128e76387a5ba7199178a4cf6caf361cbc12a0315ec851bf37c0",
+  "video_sha256": "dba74e664f64957c4f15617052df368595b662c17b0dfcaa652f0c0cab7c4577",
+  "timeline": "0-40 film; 40-43 returned hold; 43-48 reveal; 48-52 orbit ramp; 52 onward steady orbit"
+}

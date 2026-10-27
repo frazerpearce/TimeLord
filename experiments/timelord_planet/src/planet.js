@@ -29,14 +29,27 @@ float terrain(vec3 p){
  }
  return h;
 }
+// Domain-separated weather: rigid wind rotation plus a slowly moving 3D slice.
+// Its absolute clock is independent of both camera stages and terrain.
+float cloud(vec3 p){
+ float x=cos(V.w*.009),y=sin(V.w*.009);
+ p=mat3(x,0,-y,0,1,0,y,0,x)*p*8.+vec3(43,71,19);
+ vec3 drift=vec3(sin(V.w*.017),cos(V.w*.013),sin(V.w*.011))*.7;
+ float h=0.,a=.55,f=1.;
+ for(int i=0;i<8;i++){
+  h+=a*N(p*f+drift)*(1.-smoothstep(.3,1.,f*V.z/R.y*32.));
+  f*=2.03;a*=.5;
+ }
+ return h;
+}
 void main(){
  vec2 q=(2.*gl_FragCoord.xy-R)/R.y*V.z;
  float r=dot(q,q);
  vec3 col;
- {
   vec3 n=vec3(q,sqrt(max(0.,1.-r)));
   float x=cos(V.x),y=sin(V.x),u=cos(V.y),v=sin(V.y);
-  n=mat3(x,0,-y, -y*v,u,-x*v, y*u,v,x*u)*n;
+  mat3 rotation=mat3(x,0,-y,-y*v,u,-x*v,y*u,v,x*u);
+  n=rotation*n;
   float h=terrain(n);
   vec3 water=mix(vec3(.015,.06,.11),vec3(.07,.39,.42),smoothstep(-.1,.005,h));
   vec3 land=mix(vec3(.16,.25,.12),vec3(.43,.38,.24),smoothstep(.03,.2,h));
@@ -48,8 +61,15 @@ void main(){
   float light=.3+.7*max(0.,dot(normal,normalize(vec3(-.5,.7,1.))));
   col*=light;
   col+=vec3(.2,.35,.5)*pow(r,8.)*.22;
- }
- gl_FragColor=vec4(pow(r<1.?col:vec3(.008,.015,.027),vec3(.85)),1);
+ col=r<1.?col:vec3(.008,.015,.027);
+ // Orthographic intersection with a separate shell at radius 1.012.
+ vec3 shell=vec3(q,sqrt(max(0.,1.024144-r)));
+ float d=cloud(rotation*shell/1.012);
+ col*=1.-.23*smoothstep(.5,.72,cloud(normalize(n+vec3(-.5,.7,1.)*.012)))*step(r,1.);
+ vec3 top=shell*(1.+d*.04);
+ vec3 cn=normalize(cross(dFdx(top),dFdy(top)));
+ col=mix(col,vec3(.91,.95,1.)*(.6+.4*max(0.,dot(cn,normalize(vec3(-.5,.7,1.))))),.4*smoothstep(.5,.72,d)*(1.-smoothstep(1.02,1.024144,r)));
+ gl_FragColor=vec4(pow(col,vec3(.85)),1);
 }`.replace('precision highp float;','#extension GL_OES_standard_derivatives : enable\nprecision highp float;'));
 g.linkProgram(p);g.useProgram(p);
 g.bindBuffer(g.ARRAY_BUFFER,g.createBuffer());
@@ -59,9 +79,15 @@ let uniform=n=>g.getUniformLocation(p,n),view=[.4,.3,.025],seed=1,auto=true,star
 // Integration entry point: unsigned 32-bit identity and dimensionless camera.
 window.planet=(s=1,x=.4,y=.3,z=.025)=>{seed=s>>>0;view=[x,y,z];auto=false;};
 function ease(t){return t*t*t*(t*(t*6-15)+10);}
-// Eight five-second stages. The endpoint is explicitly identical to time zero.
+// The original forty-second film, then a returned-A hold, reveal and orbit.
 window.camera=t=>{
- t=(t%40+40)%40;let k=Math.floor(t/5),e=ease(t/5-k),b=k>=3&&k<=5?1:k==2?e:k==6?1-e:0,
+ t=Math.max(0,t);
+ if(t>=40){
+  let a=Math.min(Math.max((t-43)/5,0),1),u=Math.max(t-48,0),v=Math.min(u/4,1);
+  // Integral of smootherstep: smoothly accelerate to .08 radians per second.
+  return [.4+.08*(4*(v**6-3*v**5+2.5*v**4)+Math.max(0,u-4)),.3,.025*Math.pow(48,ease(a))];
+ }
+ let k=Math.floor(t/5),e=ease(t/5-k),b=k>=3&&k<=5?1:k==2?e:k==6?1-e:0,
  z=k==0||k==4?.025:k==1||k==5?.025*Math.pow(48,e):k==3||k==7?.025*Math.pow(48,1-e):1.2;
  return [.4+1.8*b,.3-.75*b,z];
 };
@@ -69,12 +95,13 @@ window.draw=t=>{
  if(auto)view=camera(t);
  c.width=innerWidth;c.height=innerHeight;g.viewport(0,0,c.width,c.height);
  g.uniform2f(uniform('R'),c.width,c.height);
- g.uniform4f(uniform('V'),...view,0);
+ g.uniform4f(uniform('V'),...view,t);
  g.uniform2f(uniform('S'),seed&65535,seed>>>16);
  g.drawArrays(g.TRIANGLES,0,3);
  return view;
 };
 function frame(now){draw((now-start)/1000);requestAnimationFrame(frame);}requestAnimationFrame(frame);
-onkeydown=()=>{auto=true;start=performance.now();};
+// Explicit restart also resets weather to time zero; manual exploration does not.
+onkeydown=e=>{if(e.code=='Space'){e.preventDefault();auto=true;start=performance.now();}};
 onwheel=e=>{auto=false;view[2]=Math.max(.006,Math.min(1.5,view[2]*Math.exp(e.deltaY*.001)));if(view[2]==1.5&&window.parentPlanet)parentPlanet(seed,...view);};
 c.onpointermove=e=>{if(e.buttons){auto=false;view[0]-=e.movementX*view[2]/300;view[1]+=e.movementY*view[2]/300;}};
