@@ -23,6 +23,8 @@ class DeliveryTests(unittest.TestCase):
                              (ROOT / 'artifacts/planet.html').read_bytes())
 
     def test_archive_contents_and_launch(self):
+        self.assertEqual((ROOT / 'artifacts/magrathea.zip').read_bytes(),
+                         (ROOT / 'artifacts/timelord-planet.zip').read_bytes())
         with tempfile.TemporaryDirectory() as directory:
             clean = Path(directory)
             with zipfile.ZipFile(ROOT / 'artifacts/timelord-planet.zip') as archive:

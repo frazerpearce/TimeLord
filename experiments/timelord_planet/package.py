@@ -6,7 +6,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[1]
-output = ROOT / 'artifacts/timelord-planet.zip'
+output = ROOT / 'artifacts/magrathea.zip'
 files = {
     'timelord_planet.py': REPO / 'timelord_planet.py',
     'seed_planet.txt': REPO / 'seed_planet.txt',
@@ -20,8 +20,11 @@ with zipfile.ZipFile(output, 'w', compression=zipfile.ZIP_DEFLATED, compressleve
         info.compress_type = zipfile.ZIP_DEFLATED
         info.external_attr = 0o100644 << 16
         archive.writestr(info, source.read_bytes())
+# Keep the original public download URL working.
+(ROOT / 'artifacts/timelord-planet.zip').write_bytes(output.read_bytes())
 manifest = {
     'archive': output.name,
+    'compatibility_archive': 'timelord-planet.zip',
     'archive_bytes': output.stat().st_size,
     'archive_sha256': hashlib.sha256(output.read_bytes()).hexdigest(),
     'files': {name: hashlib.sha256(source.read_bytes()).hexdigest() for name, source in files.items()},

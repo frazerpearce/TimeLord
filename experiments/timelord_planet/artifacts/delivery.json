@@ -1,11 +1,12 @@
 {
-  "archive": "timelord-planet.zip",
-  "archive_bytes": 6066,
-  "archive_sha256": "50bc2b7405db026e60ed6586ff4a90555e57857ee868fc554c4de60b6bbb1e71",
+  "archive": "magrathea.zip",
+  "compatibility_archive": "timelord-planet.zip",
+  "archive_bytes": 6145,
+  "archive_sha256": "949a611903702c69fd679323f35992aa586d5988f1858e29921e2201825080e7",
   "files": {
-    "timelord_planet.py": "23d8c2fdd0ab7b6e48d89f0820094c23bbae1385a71ec32ef620f79d4f9e2b8c",
+    "timelord_planet.py": "1e59b66b3997a78df50a35b33b12d4854a6c71c258a47de0efd5bbe0d3965df8",
     "seed_planet.txt": "1682925ac9fa67857201177d681c30e8f0ee8f6eac64fc217b76dcb7b85cc6b4",
-    "README.md": "70dd0a35b33058e2ffe326cc8c713e328abd119cc313a12e03a48ed24637f92d",
+    "README.md": "b37d4d1875888b1bb24affe2ef7e10a3cdeb4d1a9b193d7ace8d49e84642e5ce",
     "world.json": "454eebc7f0650ed3b0a4e3f041c96a229d03d637a9e08454093dc80440b5a7db"
   }
 }

@@ -1,4 +1,9 @@
-# TimeLord planet
+# Magrathea
+
+**Custom-made luxury planet building.**
+
+Magrathea is the planet-building strand; TimeLord is its seed transport. The
+existing launcher and seed filenames remain supported.
 
 Give the recipient `timelord_planet.py` and `seed_planet.txt`. Run:
 

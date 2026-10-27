@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Recover the complete offline planet from a TimeLord integer and open it.
+"""Magrathea: recover a complete offline planet from a TimeLord integer.
 
 This generic loader supplies no graphics, decompression, terrain or camera code.
 Deliver this script with seed_planet.txt; all application logic is in the seed.

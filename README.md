@@ -325,15 +325,21 @@ seed construction to text. It is not suitable for cryptographic use.
 
 ---
 
-# Unfold a planet from one seed
+<a id="unfold-a-planet-from-one-seed"></a>
+
+# Magrathea
+
+*Custom-made luxury planet building.*
 
 ```bash
 python3 timelord_planet.py
 ```
 
+Magrathea is the procedural planet-building strand of TimeLord.
+
 Hand someone just [`timelord_planet.py`](timelord_planet.py) and
 [`seed_planet.txt`](seed_planet.txt), or the
-[standalone delivery ZIP](experiments/timelord_planet/artifacts/timelord-planet.zip).
+[standalone delivery ZIP](experiments/timelord_planet/artifacts/magrathea.zip).
 The script uses ordinary `random.Random(integer_seed)` followed by successive
 `getrandbits(8)` calls to recover a complete offline HTML/WebGL planet, then opens
 it in a browser. No third-party Python packages are required.

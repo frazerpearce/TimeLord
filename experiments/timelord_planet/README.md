@@ -1,4 +1,9 @@
-# TimeLord planet — one 2,463-byte frame
+# Magrathea
+
+*Custom-made luxury planet building.*
+
+Magrathea is the procedural planet-building strand of TimeLord. Its complete
+transported frame remains 2,463 bytes.
 
 **The demo works, fits, and was actually run from its reconstructed TimeLord
 integer seed.** The complete binary frame is **2,463 bytes**, 29 below the
@@ -11,9 +16,14 @@ separate Bootstrap workspace's compiler experiments.
 
 ## Recipient delivery
 
+The existing `timelord_planet.py`, `seed_planet.txt` and `timelord-planet.zip`
+filenames remain supported for compatibility with previously shared links. The
+primary delivery archive is now `magrathea.zip`. TimeLord names the seed transport;
+Magrathea names the planet-building project.
+
 From the repository root, run `python3 timelord_planet.py`. The default transport
 seed is `seed_planet.txt`, beside that script. Give recipients just these two
-files, or [download the standalone ZIP](artifacts/timelord-planet.zip).
+files, or [download the standalone ZIP](artifacts/magrathea.zip).
 The archive includes a short [delivery guide](DELIVERY.md) and optional
 [world identity metadata](world.json). The initial world identity is uint32 `1`;
 this is separate from the large integer that reconstructs the program.
