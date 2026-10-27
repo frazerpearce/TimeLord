@@ -28,6 +28,15 @@ The archive includes a short [delivery guide](DELIVERY.md) and optional
 [world identity metadata](world.json). The initial world identity is uint32 `1`;
 this is separate from the large integer that reconstructs the program.
 
+For a bare delivery, use [magrathea-stripped.zip](artifacts/magrathea-stripped.zip).
+It contains only the unchanged `seed_planet.txt` and the six-line launcher in
+[`stripped/timelord_planet.py`](stripped/timelord_planet.py). There are no checks,
+comments, argument handling or status messages in that launcher. Extract the ZIP,
+change into its directory and run `python3 timelord_planet.py`. It writes
+`planet.html` there and opens it in the default browser. The installed Python
+interpreter and the browser remain declared host dependencies; neither runtime
+has been rebuilt or stripped. The transported frame is still 2,463 bytes.
+
 The launcher prints the opening-hold and pause/resume instructions. Safari
 26.6.2 was confirmed working by the recipient. An additional WebKit 26.5 check
 verified automatic zoom and Space-to-resume behavior without shader or script

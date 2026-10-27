@@ -37,6 +37,27 @@ class DeliveryTests(unittest.TestCase):
             self.assertEqual((clean / 'planet.html').read_bytes(),
                              (ROOT / 'artifacts/planet.html').read_bytes())
 
+    def test_stripped_archive_reconstructs_and_runs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            clean = Path(directory)
+            with zipfile.ZipFile(ROOT / 'artifacts/magrathea-stripped.zip') as archive:
+                self.assertEqual(set(archive.namelist()), {'timelord_planet.py', 'seed_planet.txt'})
+                archive.extractall(clean)
+            # Observe browser launching without opening a GUI during an automated test.
+            observe = (
+                "import runpy,webbrowser;from pathlib import Path;"
+                "webbrowser.open=lambda url:Path('opened-url.txt').write_text(url);"
+                "runpy.run_path('timelord_planet.py',run_name='__main__')"
+            )
+            result = subprocess.run([sys.executable, '-I', '-S', '-c', observe],
+                                    cwd=clean, check=True, capture_output=True)
+            self.assertEqual(result.stdout, b'')
+            self.assertEqual(result.stderr, b'')
+            self.assertEqual((clean / 'planet.html').read_bytes(),
+                             (ROOT / 'artifacts/planet.html').read_bytes())
+            self.assertEqual((clean / 'opened-url.txt').read_text(),
+                             (clean / 'planet.html').resolve().as_uri())
+
     def test_invalid_seed_fails_without_output(self):
         with tempfile.TemporaryDirectory() as directory:
             clean = Path(directory)

@@ -344,6 +344,13 @@ The script uses ordinary `random.Random(integer_seed)` followed by successive
 `getrandbits(8)` calls to recover a complete offline HTML/WebGL planet, then opens
 it in a browser. No third-party Python packages are required.
 
+A separate [stripped ZIP](experiments/timelord_planet/artifacts/magrathea-stripped.zip)
+contains exactly two files: the same integer seed and a six-line Python launcher.
+It only imports the standard modules, reconstructs bytes, writes `planet.html`
+and opens it. No checks, comments, command-line parsing or status output.
+Extract it, change into the extracted directory, and run `python3 timelord_planet.py`.
+This strips the launcher; it still uses an installed CPython interpreter.
+
 **Leave the mouse and trackpad untouched for the first five seconds.** The quiet
 local landscape then unfolds into a globe, rotates to another location, zooms
 back in, and returns to the identical original view over a 40-second loop.

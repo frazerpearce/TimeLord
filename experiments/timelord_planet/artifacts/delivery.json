@@ -3,6 +3,16 @@
   "compatibility_archive": "timelord-planet.zip",
   "archive_bytes": 6145,
   "archive_sha256": "949a611903702c69fd679323f35992aa586d5988f1858e29921e2201825080e7",
+  "stripped": {
+    "archive": "magrathea-stripped.zip",
+    "archive_bytes": 3266,
+    "launcher_bytes": 265,
+    "archive_sha256": "a570da6df8523ad0f4ec36ad34209ec669ae062ecbda1e3ea5e531c8b6282040",
+    "files": {
+      "timelord_planet.py": "e9140a1a3569f4162fdc191999ae1e8a34e6d9eee9ff8c9ff7b837e9af4b1629",
+      "seed_planet.txt": "1682925ac9fa67857201177d681c30e8f0ee8f6eac64fc217b76dcb7b85cc6b4"
+    }
+  },
   "files": {
     "timelord_planet.py": "1e59b66b3997a78df50a35b33b12d4854a6c71c258a47de0efd5bbe0d3965df8",
     "seed_planet.txt": "1682925ac9fa67857201177d681c30e8f0ee8f6eac64fc217b76dcb7b85cc6b4",
