@@ -1,62 +1,50 @@
-# Magrathea
+# Magrathea compact
 
 *Custom-made luxury planet building.*
 
-Give the recipient `timelord_planet.py` and `seed_planet.txt`. Run:
+This is the `Magrathea_compact` branch: the same planet and features in a smaller
+standard-Python transport. Extract the ZIP, enter its directory and run:
 
 ```sh
 python3 timelord_planet.py
 ```
 
-Requires CPython 3.9+ with its standard `random` and `gzip` modules, and a browser
-with WebGL 1, high-precision fragment floats and standard derivatives. No Python
-packages or runtime network access are needed. Python reconstructs compressed
-binary bytes from the integer, decompresses the complete HTML and opens it.
-The browser no longer needs DecompressionStream or a base64 unpacking wrapper.
+Requires standard CPython 3.9+ with `random` and `lzma`, and a WebGL browser.
+No Python packages, runtime downloads or network access are needed. The
+interpreter is not bundled. Deliver `timelord_planet.py` with `seed_planet.txt`;
+they must come from the same ZIP. This branch uses LZMA; main uses gzip.
 
-Leave the mouse and trackpad untouched to watch the film. The camera holds A
-for five seconds, reveals the globe, visits B and returns to exactly the same
-ground coordinates and camera view at 40 seconds. Clouds are active throughout, with visible formation/dissipation and latitude-dependent
-trade-wind, westerly and polar flow bands. These are a visual approximation.
-A distant fixed sun drifts slowly in the rotating planet frame, moving the
-terminator across fixed geography. Ocean glint, blue/amber twilight and occasional
-night-storm flashes are included. No city lights are added.
-After a three-second returned-A hold, the camera zooms out and smoothly enters
-an ongoing steady orbit. It does not restart the film automatically.
+The film holds A, reveals the globe, visits B and returns to the same geography
+and camera at 40 seconds. Clouds evolve under latitude-dependent winds. Ocean
+glint, twilight, slowly moving sunlight and independent local storm flashes on
+the night side are included. After a three-second hold, the camera zooms out and
+enters a continuing steady orbit. Drag/scroll pauses the camera; Space restarts
+the film, weather and sunlight. Leave the controls untouched to watch.
 
-Drag to rotate or scroll to zoom: these pause only the automatic camera, while
-weather keeps moving. Click the image and press **Space** to reset the film, sunlight, lightning
-and weather to time zero. Other keys do not reset them.
+The normal launcher can also write without opening the browser:
 
 ```sh
 python3 timelord_planet.py --no-open --output planet.html
 ```
 
-The stripped ZIP contains only the same seed and a six-line launcher, with no
-comments, checks, argument parsing or status output. Extract it, change into
-its directory and run `python3 timelord_planet.py`; it writes `planet.html` there.
-Both variants use the installed Python interpreter; neither bundles Python.
+The stripped ZIP contains exactly the same seed and an eight-line, 377-byte
+launcher, with no checks, comments or status output. It reads the seed from the
+current directory and writes `planet.html` there.
 
-The complete transported frame is **2,471 bytes**: a 2,469-byte gzip stream plus
-two-byte length. It recovers **5,285 bytes of executable HTML**. The physical
-integer is **19,967 bits / 2,496 binary bytes**, or **4,995 bytes** as hexadecimal
-text. Distribution ZIP sizes are separate measurements in `delivery.json`.
+The entire transported program is **2,207 bytes**, including the standard LZMA1
+end marker and with no external framing: **264 bytes less** than main, leaving
+**285 bytes free** under the 2,492-byte limit. It expands to **4,700 HTML bytes**.
+The physical seed remains **19,962 bits / 2,496 binary bytes**, or **4,994 bytes**
+as hexadecimal text. World identity remains uint32 `1`.
 
-`seed_planet.txt` is the large **TimeLord transport seed**, reconstructing the
-program. The planet's **world identity is uint32 1**, already encoded inside it.
-`world.json` is optional integration metadata, not a runtime dependency.
-The normal ZIP's README and world metadata can be omitted for a two-file delivery.
+The standard incremental LZMA decoder uses raw LZMA1 with an 8,192-byte dictionary,
+`lc=2`, `lp=0`, `pb=0`. No application code or scene data is in the wrapper; all
+terrain, clouds, lighting and controls are transported. Raw LZMA has no container
+checksum; the normal launcher reports the recovered document's SHA-256.
+The original and compact programs pass 32 exact pixel/view comparisons in each
+of Chromium and WebKit. Fields remain deterministic on a given backend; identical
+pixels across different GPUs are not promised. The ground is bump-shaded on a
+sphere, clouds use a thin shell, and detail is finite.
 
-All bespoke terrain, clouds, shaders, camera choreography and integration hooks
-are inside the compressed HTML. Python's generic reconstruction/decompression
-launcher and standard gzip implementation are declared loading infrastructure,
-measured separately. The browser supplies standard WebGL/DOM APIs. This is not
-CPU/OS-only self-containment. The ground is bump-shaded on a sphere, clouds use
-a thin shell, and detail is finite. Cross-GPU field/pixel identity is not claimed.
-
-This version changes the transport format from uncompressed HTML to binary gzip:
-use a matching seed and launcher from the same archive. Existing download URLs
-are retained. The old version remains in TimeLord commit `31914fa`.
-
-The repository's `experiments/timelord_planet/README.md` has the source, build
-commands, exact measurements, tests, captures and a film-to-orbit video.
+The repository's `experiments/timelord_planet/README.md` documents measurements,
+reproduction, compression search, decoder assumptions and validation reports.

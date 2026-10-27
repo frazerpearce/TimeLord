@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Magrathea: recover a complete offline planet from a TimeLord integer.
 
-This generic loader supplies gzip decompression, but no graphics, terrain or camera code.
+This generic loader supplies lzma decompression, but no graphics, terrain or camera code.
 Deliver this script with seed_planet.txt; all application logic is in the seed.
 """
 import argparse
 import hashlib
-import gzip
+import lzma
 from pathlib import Path
 import random
 import tempfile
@@ -19,10 +19,15 @@ def reconstruct(seed_path):
     if seed < 0:
         raise ValueError("expected a nonnegative integer seed")
     rng = random.Random(seed)
-    length = rng.getrandbits(8) | (rng.getrandbits(8) << 8)
-    if not 0 < length <= 2490:
-        raise ValueError("invalid TimeLord binary frame length")
-    return gzip.decompress(bytes(rng.getrandbits(8) for _ in range(length)))
+    decoder = lzma.LZMADecompressor(format=lzma.FORMAT_RAW, filters=[
+        {"id": lzma.FILTER_LZMA1, "dict_size": 8192, "lc": 2, "lp": 0, "pb": 0}])
+    document = bytearray()
+    for _ in range(2492):
+        document.extend(decoder.decompress(bytes([rng.getrandbits(8)])))
+        if decoder.eof:
+            return bytes(document)
+    raise ValueError("invalid or oversized TimeLord LZMA stream")
+
 
 
 def main():
@@ -35,7 +40,7 @@ def main():
     args = parser.parse_args()
     try:
         document = reconstruct(args.seed)
-    except (OSError, ValueError, EOFError) as error:
+    except (OSError, ValueError, EOFError, lzma.LZMAError) as error:
         parser.error(str(error))
     output = args.output or Path(tempfile.mkdtemp(prefix="timelord-planet-")) / "planet.html"
     output = output.expanduser().resolve()

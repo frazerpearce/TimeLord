@@ -1,5 +1,5 @@
 {
-  "frame_bytes": 2471,
+  "frame_bytes": 2207,
   "limit_bytes": 2492,
   "original_timelord_tests_passed": 15,
   "delivery_tests_passed": 4,
@@ -25,7 +25,8 @@
     "browser-verification.json",
     "webkit-verification.json",
     "delivery.json",
-    "media.json"
+    "media.json",
+    "compact-comparison.json"
   ],
   "cloud_generations_smooth": true,
   "cloud_evolution_on_moving_parcels": true,
@@ -37,5 +38,16 @@
   "night_side_storm_flashes": true,
   "solar_drift_radians_per_second": 0.004,
   "storm_cells_have_independent_flash_clocks": true,
-  "simultaneously_flashing_and_dark_cells_verified": true
+  "simultaneously_flashing_and_dark_cells_verified": true,
+  "compact_branch": "Magrathea_compact",
+  "python_delivery_and_transport_tests_passed": 6,
+  "standard_cpython_runtime_versions": [
+    "3.9.6",
+    "3.13.9"
+  ],
+  "comparison_reference_commit": "d7aa3cd",
+  "exact_reference_pixel_and_view_comparisons_per_browser": 32,
+  "complete_readable_application_source_unchanged": true,
+  "compression": "standard lzma raw LZMA1",
+  "external_framing_bytes": 0
 }

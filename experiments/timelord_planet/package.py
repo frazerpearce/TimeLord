@@ -6,7 +6,7 @@ import zipfile
 
 ROOT = Path(__file__).resolve().parent
 REPO = ROOT.parents[1]
-output = ROOT / 'artifacts/magrathea.zip'
+output = ROOT / 'artifacts/magrathea-compact.zip'
 files = {
     'timelord_planet.py': REPO / 'timelord_planet.py',
     'seed_planet.txt': REPO / 'seed_planet.txt',
@@ -23,12 +23,15 @@ def pack(destination, members):
             archive.writestr(info, source.read_bytes())
 
 pack(output, files)
-stripped = ROOT / 'artifacts/magrathea-stripped.zip'
+stripped = ROOT / 'artifacts/magrathea-compact-stripped.zip'
 stripped_files = {
     'timelord_planet.py': ROOT / 'stripped/timelord_planet.py',
     'seed_planet.txt': REPO / 'seed_planet.txt',
 }
 pack(stripped, stripped_files)
+# Branch-local legacy names remain matching compact packages.
+(ROOT / 'artifacts/magrathea.zip').write_bytes(output.read_bytes())
+(ROOT / 'artifacts/magrathea-stripped.zip').write_bytes(stripped.read_bytes())
 # Keep the original public download URL working.
 (ROOT / 'artifacts/timelord-planet.zip').write_bytes(output.read_bytes())
 manifest = {

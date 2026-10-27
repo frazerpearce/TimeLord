@@ -1,349 +1,149 @@
-# Magrathea
+# Magrathea compact
 
 *Custom-made luxury planet building.*
 
-**Works, fits, and was actually run offline from its reconstructed TimeLord
-integer seed.** The new complete frame is **2,471 bytes**, 21 below the
-2,492-byte information limit. The ground is unchanged. Clouds move and evolve
-through the original 40-second film, then the camera enters a sustained orbit.
+Branch: `Magrathea_compact`. All features from main commit `d7aa3cd` are retained.
+The complete transported program is **2,207 bytes**, down from **2,471**:
+**264 bytes saved (10.68%)**, with **285 bytes free** under the 2,492-byte limit.
+This is the best measured candidate, not a claim of a global minimum.
 
 ## Run or deliver
 
-From the repository root:
-
 ```sh
 python3 timelord_planet.py
-# Or reconstruct without opening a browser:
+```
+
+Give someone [the compact ZIP](artifacts/magrathea-compact.zip), or the
+[stripped compact ZIP](artifacts/magrathea-compact-stripped.zip). The stripped
+ZIP contains exactly `timelord_planet.py` and `seed_planet.txt`. Extract it,
+enter the directory, and run the command above. It writes and opens `planet.html`.
+The normal launcher finds the seed beside itself; the stripped launcher reads
+it from the current directory.
+
+Only standard CPython 3.9+ with its `random` and `lzma` modules is required.
+No Python packages, custom codec, downloaded data, or runtime network access.
+A WebGL browser supplies the same graphics and DOM facilities as before.
+The interpreter is not bundled. Use the launcher and seed from the same ZIP:
+this branch uses LZMA transport; main uses gzip.
+
+```sh
 python3 timelord_planet.py --no-open --output planet.html
 ```
 
-Download [Magrathea](artifacts/magrathea.zip) or the
-[stripped two-file distribution](artifacts/magrathea-stripped.zip).
-The normal archive includes [instructions](DELIVERY.md) and optional
-[identity/view metadata](world.json). The stripped archive contains exactly the
-same seed and a 287-byte, six-line Python launcher: no comments, checks,
-argument parsing or status messages. Extract it, enter the extracted directory,
-and run `python3 timelord_planet.py`; it writes `planet.html` and opens it.
+Leave the mouse/trackpad untouched for the 40-second A/B/A film, returned-view
+hold, globe reveal and continuing orbit. Drag or scroll to explore; the camera
+pauses while weather and sunlight continue. Space resets the whole timeline.
+Terrain, cloud evolution, latitude winds, ocean glint, twilight, moving sunlight
+and independently timed night-side lightning are unchanged. Geography and the
+returned camera are fixed; illumination advances with time. World identity is
+still uint32 `1`, distinct from the large transport seed.
 
-The normal script finds `seed_planet.txt` beside itself. The stripped script
-reads it in the current directory. Both require CPython 3.9+ and a compatible
-browser, with no installed Python packages or runtime network access.
-The Python interpreter itself has not been bundled or stripped.
+## What saves space
 
-Existing `timelord_planet.py`, `seed_planet.txt` and `timelord-planet.zip` public
-paths remain supported. Download the seed and launcher together: this version
-uses binary gzip transport, whereas the earlier loader expected direct HTML.
-The original version is preserved in TimeLord commit `31914fa`, and a development
-snapshot was saved separately before editing. The heads/text demos and the
-Bootstrap compiler experiments have not been changed.
+- Shorter internal GLSL and JavaScript identifiers, without renaming object
+  properties or strings. Public `planet`, `camera`, `draw`, controls and parent
+  integration remain available.
+- Standard WebGL numeric enum values replace their longer symbolic names.
+- Equivalent boolean expressions and shorter global assignments.
+- Tuned **standard LZMA1** replaces gzip. Its end marker replaces the external
+  two-byte length. Every rendered formula, constant and order of operations is
+  retained in the unchanged readable [source](src/planet.js).
 
-Open the [recovered executable document](artifacts/planet.html), inspect
-[A](artifacts/A.png), [globe](artifacts/globe.png), [B](artifacts/B.png),
-[returned A with later weather](artifacts/A-return.png),
-[steady orbit](artifacts/orbit.png), or watch the
-[130-second film-to-orbit capture](artifacts/loop.mp4).
+The readable source has not been golfed. [compact.py](compact.py) applies the
+checked-in [configuration](compact-config.json) at build time. [optimize.py](optimize.py)
+searches alternative identifier allocations and standard compression settings;
+a normal rebuild does not repeat the search. The final search measured 20,782
+candidates; earlier trials also compared gzip strategies, LZMA2, delta and BCJ
+filters. See [measured comparisons](artifacts/compact-comparison.json).
 
-## Camera and weather timeline
+The raw decoder uses `lzma.FORMAT_RAW` with `FILTER_LZMA1`, dictionary 8,192,
+`lc=2`, `lp=0`, `pb=0`. Encoding uses normal mode, HC3, nice length 32 and search
+depth 64. These are generic compression parameters, with no scene dictionary or
+Magrathea algorithms hidden in the wrapper. Python supplies its standard decoder;
+all bespoke graphics, terrain, clouds, controls and camera code remain in the seed.
 
-| Seconds | Automatic camera |
-|---|---|
-| 0–5 | Hold A |
-| 5–10 | Zoom out |
-| 10–15 | Rotate to B |
-| 15–20 | Zoom in |
-| 20–25 | Hold B |
-| 25–30 | Zoom out |
-| 30–35 | Rotate back to A |
-| 35–40 | Zoom in to precisely the original A camera |
-| 40–43 | Hold the returned landscape |
-| 43–48 | Zoom out to the globe |
-| 48–52 | Smoothly accelerate the orbital camera |
-| 52 onward | Steady orbit at .08 radians/s, about 78.54 s/revolution |
+The raw format has an end marker but no container checksum. The normal launcher
+rejects malformed/oversized streams, caps consumption at 2,492 draws and prints
+the recovered SHA-256. The stripped launcher intentionally omits checks/comments.
+This is an offline demonstration, not a cryptographic transport.
 
-A stays at `(longitude=.4, latitude=.3)` and B at `(2.2,-.45)` radians, roughly
-109 degrees apart. Both local views have orthographic half-height `z=.025` in
-planet radii. Globe half-height is 1.2. The coordinates and world seed were never
-searched or moved for visual attractiveness.
-
-The camera is evaluated from absolute elapsed time, not integrated or wrapped
-back to zero after the film. Motion uses quintic smootherstep. Orbital position
-uses its analytic integral over a four-second speed ramp, so velocity enters
-and leaves the ramp continuously. Latitude and apparent globe size stay fixed
-in steady orbit. The unit sphere and its geography never rotate in local space;
-only the viewpoint changes.
-
-Drag or wheel zoom pauses the **camera**, while cloud time keeps advancing.
-**Space** resets the film and weather clock to zero, retaining the selected
-world identity. Other keys have no effect. Resizing changes pixel sampling.
-There is no separate touch-pinch handler or on-screen interface.
-
-## Terrain and clouds
-
-`src/planet.js` separates setup, noise/terrain, cloud field, shading, timeline
-and integration. The terrain's three functions (`H`, `N`, `terrain`) are
-byte-for-byte identical to the previous generator. `baseline.json` records
-hashes checked by `verify.py`. Large-scale domain-warped 3D value noise plus
-13 octaves gives persistent continents, oceans, uplands, ridges and valleys.
-This is an artistic fractal field, not an erosion, hydrology or tectonics model.
-
-Ground geometry remains a unit sphere with differential bump shading from that
-same filtered terrain field. It is not displaced geometry or a flight simulator.
-No field depends on camera traversal, and terrain has no time argument.
-
-Weather is a separate, domain-separated 3D field selected by the world seed,
-using eight smoothly filtered octaves. Clouds now visibly form and dissipate:
-two overlapping generations are smoothly blended, with a new generation every
-12 seconds and a spatially varying phase to avoid synchronized global pulsing.
-Each generation samples a distinct deterministic noise domain. Continuous
-sampling-slice drift adds deformation within a generation. The old field exactly
-matches the next generation's previous field at handoff; zero blend derivatives
-prevent popping. Cloud ages are bounded to 24 seconds, avoiding indefinitely
-stretched streaks under differential winds.
-
-Wind depends on `y=sin(latitude)` through
-`wind(y)=.018*(-1+6*y*y-6*y*y*y*y)` radians/s. Backward advection uses the opposite
-angle for lookup, so actual flow is westward near the equator, eastward at middle
-latitudes and westward near the poles. Sign changes occur at approximately 27.4
-and 62.6 degrees in both hemispheres. Tangential motion naturally vanishes at
-the poles. These are qualitative trades/westerlies/polar-easterlies bands, not
-a numerical integration of Coriolis forces or a physical atmosphere model.
-The [24-second fixed-view weather clip](artifacts/weather.mp4) makes formation
-and dissipation visible separately from camera motion.
-
-All weather is a pure function of local position, seed, filter footprint and
-absolute time; no stateful random draws occur while running.
-
-Clouds are sampled at orthographic intersections with a shell of radius 1.012,
-creating parallax relative to the ground. Opacity is capped at .5, allowing the
-ground to remain visible even under cloud banks. Filtered cloud height also
-provides differential cloud-top lighting. A displaced sample of the same field
-provides a compact approximate ground shadow. The cloud surface is thin and
-bump-shaded: there is no volume, multiple scattering or volumetric ray marching.
-Clear local views can occur naturally. The cloud renderer is active from the
-first image and never switches off at camera transitions.
-
-
-Lighting uses a distant, inertially fixed sun. In the planet's rotating local
-frame it starts at `normalize([1,-.1,.3])` and drifts west at .004 radians/s,
-equivalent to a planetary rotation period of about 26.18 minutes in demo time.
-The ground coordinates remain fixed to the surface; the terminator advances
-without rotating or regenerating the terrain field. Camera orbital speed is
-independent of this solar drift.
-
-Ground and cloud normals use the same solar direction, as does the shadow
-lookup. Ocean-only specular reflection gives a warm sun-glint; an analytic rim
-changes from blue to amber near twilight and fades into night. These are compact
-lighting approximations, not a full atmospheric scattering or water model.
-Ambient illumination stays at 1.8% and night masks prevent back-facing terrain
-or clouds from receiving direct sunlight.
-
-Dense night-side cloud banks can produce brief blue-white intra-cloud lightning.
-Each local Cartesian storm cell has its own seeded flash frequency and phase,
-with smooth narrow envelopes. Periods range from about 4.2 to 12.6 seconds;
-there are no shared global timing groups. They require sufficiently
-dense current clouds, are masked by the cloud shell, and fade out in daylight.
-They are localized cloud glows, not geometric lightning bolts. City lights are
-not included; the planet remains uninhabited.
-
-Both fields use Cartesian sphere coordinates, with no longitude texture seam
-or pole singularity. All derivative calculations run outside divergent masks.
-Ground and cloud masks are applied after derivative evaluation.
-
-`draw(t)` supplies the same absolute `t` to camera, weather, rotation and flashes.
-Returning to A reproduces the **geography and camera**. Solar illumination now
-advances as requested, so even a ground-only image at 40 seconds differs from
-time zero. The terrain field itself is byte-identical to the original generator.
-
-The verifier also derives a ground-only shader with solar time held at zero to
-compare geography and rendering under identical lighting. Those explicit initial
-and returned RGBA frames match exactly on each tested backend. The Chromium hash
-for this controlled comparison is:
-
-```text
-f96e37a5134efedd6ee36d278298e80d390b4f2872e5bb3131e8868906c11844
-```
-
-The actual-time ground render is separately checked to change with the moving
-sun; it is not falsely reported as an identical full-time endpoint frame.
-
-## Scale and numerical limits
-
-The film retains a 48x magnification reveal (`1.2/.025`). Exploration retains
-`.006 <= z <= 1.5`, with a tested local-to-globe range of 200x (`1.2/.006`).
-At 960×640 the vertical span is `2*z` radii, or .05 at the film's local view.
-A vertical pixel spans 7.8125e-5 radii there, and 1.875e-5 at maximum zoom.
-No physical radius/metres-per-pixel is specified.
-
-Terrain has frequency ratio 2.03, amplitude ratio .55, and a finest nominal
-lattice frequency `2.7*2.03^12`, about 13,223 per radius before warp stretch.
-Its filter is `1-smoothstep(.3,1,f*z/height*10.8)`. Clouds have frequency ratio
-2.03, amplitude ratio .5 and filter `1-smoothstep(.3,1,f*z/height*32)` for their
-base frequency 8. These are smooth center-footprint estimates; they do not
-provide a complete anisotropic/Jacobian filter at the limb. Residual limb and
-derivative-quad artifacts are possible. There is finite detail, not infinite
-zoom. Very long runtimes eventually lose GPU float clock/angle precision.
-
-Across eight predetermined probes, terrain differs by at most .011277 height
-units between globe and ordinary local filtering. Additional detail exposed
-from `.025` to `.006` changes these probes by up to .0003052. Tiny coastlines,
-cloud density and lighting can vary as filtered detail appears. Stored textures,
-terrain maps, frame sequences and traversal-dependent caches are absent.
-
-GLSL floating-point noise hashing uses `sin`; different graphics implementations
-can change the fields as well as rendered pixels. Pure world/weather evaluation
-is repeatable at the same seed, coordinate, time, filter and backend. Neither
-field nor pixel bit identity across GPUs is promised. Fixed-width identity
-and address derivation are independent of these floating-point variations.
-
-## Binary transport and host contract
-
-The complete minified HTML is gzip-compressed directly. The seed reproduces:
-
-```text
-two-byte little-endian compressed length | gzip bytes
-```
-
-The generic Python loader instantiates actual `random.Random(integer_seed)`,
-then calls `getrandbits(8)` successively for the entire frame. Python's standard
-`gzip.decompress` recovers HTML, which is written and opened. There is no
-`setstate`, substituted PRNG, application algorithm in the launcher, base64
-encoding, or browser unpacking program.
-
-**Explicit new loading contract:** CPython, its `random` implementation and
-standard-library gzip/DEFLATE decoder are declared loading infrastructure.
-Generic reconstruction/decompression/writing/launching code is measured
-separately, outside the application-information frame. All bespoke terrain,
-weather, rendering, controls, camera constants and integration code are inside
-the compressed HTML. This differs from the old direct-HTML loader contract;
-it is not a claim of CPU/OS-only self-containment.
-
-The running HTML needs a browser with WebGL 1, fragment `highp`,
-`OES_standard_derivatives` and standard DOM/JavaScript APIs. It no longer requires
-DecompressionStream, Blob/Response streams or base64 decoding. Browser, driver,
-OS and hardware are host infrastructure, not transported implementations.
-No graphics assets, libraries or network calls are needed.
-
-## Exact accounting
+## Actual byte accounting
 
 | Measurement | Bytes |
 |---|---:|
 | Readable JavaScript, comments included | 6,855 |
-| Raw HTML with readable JavaScript | 6,878 |
-| Minified JavaScript/shaders | 5,262 |
-| Complete executable minified HTML | 5,285 |
-| Binary gzip stream, including header/trailer | 2,469 |
-| Length framing | 2 |
-| **Complete transported frame** | **2,471** |
-| **Room remaining under 2,492** | **21** |
-| Minimal generic reconstruction loader | 373 |
-| Normal launcher | 2,257 |
-| Stripped launcher | 287 |
-| Physical integer binary storage | 2,496 |
-| Physical integer hexadecimal text file | 4,995 |
+| Minified JavaScript and shaders | 4,677 |
+| Complete recovered HTML | 4,700 |
+| Raw LZMA1 stream including its end marker | 2,207 |
+| Additional framing | 0 |
+| **Complete transported payload** | **2,207** |
+| **Free capacity under 2,492** | **285** |
+| Generic checked reconstruction script | 472 |
+| Normal launcher | 2,444 |
+| Stripped launcher | 377 |
+| Physical transport seed binary storage | 2,496 |
+| Transport seed as hexadecimal text | 4,994 |
 
-The seed has **19,967 bits**. `artifacts/sizes.json` contains authoritative
-machine-readable values and hashes. Distribution ZIP sizes/hashes are recorded
-separately in `artifacts/delivery.json`; they are not claimed to fit in the seed.
-`frame.bin` and `planet.html.gz` are the actual transported frame and gzip body.
+The integer is **19,962 bits**. Payload savings make room for more encoded
+program/data; they do not shrink the MT19937 transport integer to 2,207 bytes.
+ZIP sizes are separate and recorded in [delivery.json](artifacts/delivery.json).
+[frame.bin](artifacts/frame.bin) and [planet.html.lzma](artifacts/planet.html.lzma)
+are identical: the complete raw stream, not an external asset reference.
+[sizes.json](artifacts/sizes.json) contains the authoritative hashes and counts.
 
-The old package used 1,722 gzip bytes expanded into 2,296 base64 bytes, plus a
-165-byte HTML browser unpacker and two-byte frame: **2,463 bytes**. Repacking
-that unchanged old scene as binary-compressed complete HTML measured **1,740**
-framed bytes, freeing 723 bytes. The current weather, latitude winds, rotating sunlight, glint, twilight, storm
-flashes and orbital controls add 731 compressed bytes, yielding **2,471**.
-This is 8 bytes larger than the original delivery, and 196 bytes larger than
-the preceding 2,275-byte fixed-sun version (commit `ea94634`). No minimum-size
-claim is made.
+CPython's unmodified `random.Random(integer_seed)` and successive `getrandbits(8)`
+recover the stream. The standard incremental LZMA decoder stops at its end marker;
+there is no hard-coded application length, `setstate`, modified RNG, or payload
+lookup. This is standard-library/browser self-containment, not CPU/OS-only.
 
-## Identity and integration
-
-`planet(worldSeed, longitude=.4, latitude=.3, z=.025)` installs a world/view and
-pauses the automatic camera. Identity uses JavaScript `>>>0`, unsigned uint32;
-interchange integer values in `0..4294967295`. Low/high 16-bit halves reach the
-shader separately. The default world identity is 1. This is distinct from the
-large TimeLord transport seed reconstructing the application. Neither the noise
-mapping nor the address hash is claimed collision-free or cryptographic.
-
-Camera state is `[longitude,latitude,z]`, with radians, no roll and orthographic
-half-height in planet radii. Center is
-`[sin(longitude)*cos(latitude),sin(latitude),cos(longitude)*cos(latitude)]`.
-Preserve world identity, view, generator version and elapsed weather time to
-restore a full scene; just identity/view suffices to restore the ground.
-For explicit testing/parent rendering, `draw(t)` renders at supplied seconds and
-returns the view; `camera(t)` exposes the timeline. Calling `planet` does not
-reset the application clock. A future parent may install
-`parentPlanet(seed,longitude,latitude,z)`; wheel zoom reaching `z=1.5` invokes it.
-There is no parent renderer or integration framework hidden outside the payload.
-
-For future hierarchical addressing, `address.py` defines each edge as FNV-1a-32
-of `uint32_le(parentSeed) || ASCII(kind) || uint32_le(childID)`, where kind is
-`G`, `S` or `P`. Initial value is 2166136261; each byte updates
-`h=((h XOR byte)*16777619) mod 2^32`. Universe seed 1, galaxy ID 2, star ID 3,
-planet ID 4 gives `2870994987 -> 2462232634 -> 2638447889`. Keep the hierarchy tuple
-and generator version as the complete address. This optional parent reference
-is not read by the packed planet. Use hierarchical parent coordinates and local
-planet coordinates, never universe and surface detail in one float position.
-
-## Rebuild, test and capture
-
-Only the Python standard library and the included MIT-licensed TimeLord inverter
-are required to build and package. Tested with CPython 3.13.9.
+## Reproduce and verify
 
 ```sh
 python3 experiments/timelord_planet/build.py
 python3 experiments/timelord_planet/package.py
 python3 experiments/timelord_planet/verify.py
-python3 experiments/timelord_planet/test_delivery.py -v
 python3 -m unittest discover -s tests -v
+python3 -m unittest discover -s experiments/timelord_planet -p 'test_*.py' -v
 ```
 
-`verify.py` requires byte-identical rebuilds, checks preserved terrain source,
-actual CPython output, framing/size, exact decompression and isolated minimal,
-normal and stripped loaders. Browser verification requires Node/Playwright:
+`verify.py` rebuilds the same seed and bytes, checks the original terrain function
+hashes, reconstructs using actual CPython outputs, and runs isolated minimal,
+normal and stripped recipients with `-I -S` (no site packages).
+
+With an existing Node/Playwright installation and local browsers:
 
 ```sh
-npm install --no-save playwright
-npx playwright install chromium webkit
-cd experiments/timelord_planet
-PLANET_NODE=$(command -v node)
-python3 verify.py --browser "$PLANET_NODE"
-python3 verify.py --browser "$PLANET_NODE" --webkit
+python3 experiments/timelord_planet/verify.py --browser /path/to/node
+python3 experiments/timelord_planet/verify.py --browser /path/to/node --webkit
 ```
 
-Or set `PLAYWRIGHT_MODULE` to an existing module directory and
-`PLAYWRIGHT_BROWSERS_PATH` to its browser cache. macOS may require ordinary
-Terminal execution where a sandbox blocks browser initialization.
+The harness opens **only recovered recipient HTML**. Its existing checks cover
+shaders, evolving clouds, local storm clocks, wind bands, sunlight, glint,
+terrain continuity, camera choreography and controls. Diagnostic shaders restore
+readable identifier names solely for observation; the production app remains
+minified. It also recreates the original published HTML from unchanged source
+and checks its SHA-256 before **32 exact comparisons per browser**: 12 film times,
+18 renders across six world seeds, manual controls and reset. Production pixel
+hashes and returned views must match exactly. No arithmetic simplifications or
+lower precision are used. Cross-GPU pixel identity is not promised.
 
-The browser checks load only recovered recipient HTML. They verify exact
-camera endpoints and ground-only pixels under frozen solar time, changing composites, seeded field purity,
-cloud evolution beyond rigid advection, spatial/time continuity, seam/poles,
-coarse/fine stability, six seeds, eight fixed locations, exact view restoration,
-controls, continuous weather time, smooth generation handoffs, latitude wind signs and
-hemisphere symmetry, day/night brightness, measured ocean reflection contribution, changing solar
-direction, independent storm-cell peak times and simultaneously flashing/dark cells,
-intermittent night-side storm emission, smooth orbit
-acceleration, sustained angular speed and fixed globe size. Both normal and stripped recovered documents are
-opened. Diagnostic ground shaders remove only the transported cloud/shadow
-compositing block; diagnostic field shaders reuse actual transported field code.
-No missing application algorithms come from the verifier.
+Chromium uses its network-offline mode; WebKit blocks HTTP(S) routes because
+its offline switch rejects local files here. Both require only local HTML.
+The original heads/text tests remain unchanged. Browser and transport reports
+are in [artifacts](artifacts/verification-summary.json).
 
-Chromium runs with its network offline. WebKit on this host rejects local-file
-navigation with its offline switch; its HTTP(S) routes are instead aborted.
-Both checks require no requests beyond the recovered local HTML. Reports identify
-this distinction, backend, hashes, numerical samples, timing and any errors.
-The script's actual requestAnimationFrame callback is also exercised.
+The [existing movie](artifacts/loop.mp4) and [weather clip](artifacts/weather.mp4)
+were captured from the equivalent main program. Their original document hashes
+remain recorded in [media.json](artifacts/media.json), alongside the compact
+comparison references. The [historical report](IMPLEMENTATION.md) documents the
+unchanged terrain/weather model, coordinate/address integration and numerical
+limits; its old transport and size claims apply only to main at `d7aa3cd`.
 
-To capture the film, a complete day/night orbit and a fixed-view weather clip:
+Optional development search, using standard Python only:
 
 ```sh
-python3 verify.py --browser "$PLANET_NODE" --video
-ffmpeg -y -framerate 12 -i artifacts/frames/%04d.png \
-  -c:v libx264 -crf 20 -pix_fmt yuv420p -movflags +faststart artifacts/loop.mp4
-ffmpeg -y -framerate 12 -i artifacts/weather-frames/%04d.png \
-  -c:v libx264 -crf 20 -pix_fmt yuv420p -movflags +faststart artifacts/weather.mp4
+python3 experiments/timelord_planet/optimize.py --output /tmp/compact-candidate.json
 ```
 
-The delivered video lasts 130 seconds at 960×640; the interactive version uses
-browser animation frames. Capture PNGs can be deleted after encoding. The video
-and snapshots are outputs only, never runtime inputs. Browser and video tools
-are development dependencies, not application assets.
+Search output is a candidate configuration, not a replacement delivery. Rebuild,
+recheck exact image equivalence and regenerate the packages before publishing it.

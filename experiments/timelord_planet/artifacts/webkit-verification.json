@@ -16,7 +16,7 @@
   "offline": true,
   "network_protection": "HTTP(S) routes aborted",
   "requests": [
-    "file:///var/folders/6h/fzswqsb11d91__njdsgwv2f80000gn/T/magrathea-clean-ue_ij_9u/normal/planet.html"
+    "file:///var/folders/6h/fzswqsb11d91__njdsgwv2f80000gn/T/magrathea-clean-87nmffls/normal/planet.html"
   ],
   "errors": [],
   "initial": {
@@ -2547,22 +2547,30 @@
   "timing": {
     "frames": 30,
     "synchronous_readback": true,
-    "median_render_ms": 5,
-    "max_render_ms": 9
+    "median_render_ms": 3,
+    "max_render_ms": 6
   },
   "animation": {
     "actual_application_callback_ran": true,
     "frames": 61,
-    "elapsed_ms": 1004
+    "elapsed_ms": 1017
   },
   "distributionSmoke": [
     {
       "distribution": "stripped",
       "hash": "422e89ca5d353ae467b023d9074891d560c838793946c50d0caf8a51b7c787ed",
       "requests": [
-        "file:///var/folders/6h/fzswqsb11d91__njdsgwv2f80000gn/T/magrathea-clean-ue_ij_9u/stripped/planet.html"
+        "file:///var/folders/6h/fzswqsb11d91__njdsgwv2f80000gn/T/magrathea-clean-87nmffls/stripped/planet.html"
       ],
       "errors": []
+    }
+  ],
+  "equivalence": [
+    {
+      "reference_commit": "d7aa3cd",
+      "reference_html_sha256": "1ab6ca5b1459306507b26eb47571eb5b4e5774c27d7ce69019574ce28c8df8ec",
+      "comparisons": 32,
+      "pixel_identical": true
     }
   ]
 }

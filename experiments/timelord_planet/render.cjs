@@ -2,6 +2,7 @@
 const engines=require(process.env.PLAYWRIGHT_MODULE||'playwright');
 const fs=require('fs'),path=require('path'),assert=require('assert');
 const out=path.join(__dirname,'artifacts');
+const compactConfig=require('./compact-config.json');
 const engine=process.argv.includes('--webkit')?'webkit':'chromium';
 (async()=>{
  const browser=await engines[engine].launch(engine==='chromium'?{args:['--use-angle=swiftshader','--enable-unsafe-swiftshader']}:{});
@@ -17,7 +18,7 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
  });
  const target='file://'+path.resolve(process.argv[2]||out+'/planet.html');
  await page.goto(target);await page.waitForFunction('typeof draw=="function"',null,{polling:100});
- const diagnostic=await page.evaluate(()=>{
+ const diagnostic=await page.evaluate(identifiers=>{
   const vertex=g.getAttachedShaders(p).find(s=>g.getShaderParameter(s,g.SHADER_TYPE)===g.VERTEX_SHADER);
   const fragment=g.getAttachedShaders(p).find(s=>g.getShaderParameter(s,g.SHADER_TYPE)===g.FRAGMENT_SHADER);
   function compile(source){
@@ -28,7 +29,8 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
    if(!g.getProgramParameter(program,g.LINK_STATUS))throw Error(g.getProgramInfoLog(program));
    return program;
   }
-  const source=g.getShaderSource(fragment);
+  const inverse=Object.fromEntries(Object.entries(identifiers).map(([a,b])=>[b,a]));
+  const source=g.getShaderSource(fragment).replace(/\b[A-Za-z_]\w*\b/g,name=>inverse[name]||name);
   // Remove the shell, shadow and composite block ONLY, retaining actual ground rendering.
   const groundSource=source.replace(/vec3 shell=[\s\S]*?(?=gl_FragColor=)/,'');
   if(groundSource===source||groundSource.includes('col*=1.-.23'))throw Error('ground extraction failed');
@@ -39,7 +41,7 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
   window.obs={app:p,source,compile,ground:compile(frozenGround),groundActual:compile(groundSource),noGlint:compile(noGlint),noFlash:compile(noFlash)};
   const debug=g.getExtension('WEBGL_debug_renderer_info');
   return {shaders:g.getAttachedShaders(p).map(s=>({ok:g.getShaderParameter(s,g.COMPILE_STATUS),log:g.getShaderInfoLog(s)})),linked:g.getProgramParameter(p,g.LINK_STATUS),renderer:debug?g.getParameter(debug.UNMASKED_RENDERER_WEBGL):g.getParameter(g.RENDERER)};
- });
+ },compactConfig.glsl_identifiers);
  assert(diagnostic.linked&&diagnostic.shaders.every(s=>s.ok));
  async function render(time,ground=false){
   return await page.evaluate(async({time,ground})=>{
@@ -227,9 +229,30 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
   assert.equal(hash,initial.hash);assert.deepStrictEqual(smokeErrors,[]);assert(seen.every(x=>x===url));
   distributionSmoke.push({distribution:'stripped',hash,requests:seen,errors:smokeErrors});await smoke.close();
  }
+ // The production shader stays minified; compare it with the unmodified published program.
+ const equivalence=[];
+ if(process.argv[4]&&!process.argv[4].startsWith('--')){
+  const reference=await context.newPage();await reference.addInitScript(()=>requestAnimationFrame=()=>0);
+  await reference.goto('file://'+path.resolve(process.argv[4]));
+  async function samples(tab){return await tab.evaluate(async()=>{
+   const rows=[];
+   async function hash(){const bytes=new Uint8Array(c.width*c.height*4);g.readPixels(0,0,c.width,c.height,g.RGBA,g.UNSIGNED_BYTE,bytes);return Array.from(new Uint8Array(await crypto.subtle.digest('SHA-256',bytes))).join(',');}
+   onkeydown({code:'Space',preventDefault(){}});
+   for(const t of [0,10,20,40,48,60,80,95,100,104.3,120,400]){draw(t);rows.push({kind:'film',time:t,hash:await hash()});}
+   for(const seed of [0,1,2,42,65536,4294967295]){
+    planet(seed,4.4,.1,1.2);for(const t of [0,80,104.3]){draw(t);rows.push({kind:'world',seed,time:t,hash:await hash()});}
+   }
+   planet(42,.4,.3,.025);onwheel({deltaY:-100});c.onpointermove({buttons:1,movementX:30,movementY:10});
+   rows.push({kind:'controls',view:[...draw(9)],hash:await hash()});
+   onkeydown({code:'Space',preventDefault(){}});rows.push({kind:'reset',view:[...draw(0)],hash:await hash()});
+   return rows;
+  });}
+  const current=await samples(page),original=await samples(reference);assert.deepStrictEqual(current,original,'compact production images and controls must exactly match the published program');
+  equivalence.push({reference_commit:compactConfig.reference_commit,reference_html_sha256:compactConfig.reference_html_sha256,comparisons:current.length,pixel_identical:true});await reference.close();
+ }
  assert.deepStrictEqual(errors,[]);assert(requests.every(url=>url===target));
  assert.equal(await page.evaluate(()=>g.getError()),0);assert.equal(await page.evaluate(()=>g.isContextLost()),false);
- const report={engine,browser:browser.version(),...diagnostic,offline:true,network_protection:engine==='chromium'?'browser offline':'HTTP(S) routes aborted',requests,errors,initial,returned,groundInitial,groundReturn,solarReturn,ground_endpoint_frame_equal_with_frozen_sun:true,composite_endpoint_frame_equal:false,captures,choreography,field,coarse_max_error:coarseError,finer_detail_max_change:fineReveal,evolution_beyond_advection:evolution,seedRenders,locations,lighting,glints,flashes,controls,clock,opening_cloud_motion:openingChanged,globe_cloud_motion:globeWeatherMoves,timing,animation,distributionSmoke};
+ const report={engine,browser:browser.version(),...diagnostic,offline:true,network_protection:engine==='chromium'?'browser offline':'HTTP(S) routes aborted',requests,errors,initial,returned,groundInitial,groundReturn,solarReturn,ground_endpoint_frame_equal_with_frozen_sun:true,composite_endpoint_frame_equal:false,captures,choreography,field,coarse_max_error:coarseError,finer_detail_max_change:fineReveal,evolution_beyond_advection:evolution,seedRenders,locations,lighting,glints,flashes,controls,clock,opening_cloud_motion:openingChanged,globe_cloud_motion:globeWeatherMoves,timing,animation,distributionSmoke,equivalence};
  fs.writeFileSync(out+'/'+(engine==='chromium'?'browser-verification.json':'webkit-verification.json'),JSON.stringify(report,null,2)+'\n');
  console.log(JSON.stringify({engine,ground_endpoint_equal_with_frozen_sun:true,clouds_evolve:true,coarseError,fineReveal,timing,framed_bytes:JSON.parse(fs.readFileSync(out+'/sizes.json')).total_framed_bytes}));
  if(process.argv.includes('--video')){

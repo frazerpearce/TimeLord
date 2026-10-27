@@ -1,30 +1,40 @@
 {
   "raw_source_bytes": 6855,
   "raw_html_bytes": 6878,
-  "minified_bytes": 5262,
-  "executable_html_bytes": 5285,
-  "gzip_bytes": 2469,
-  "packed_payload_bytes": 2469,
-  "framing_bytes": 2,
-  "total_framed_bytes": 2471,
+  "minified_bytes": 4677,
+  "executable_html_bytes": 4700,
+  "packed_payload_bytes": 2207,
+  "framing_bytes": 0,
+  "total_framed_bytes": 2207,
   "limit_bytes": 2492,
-  "html_sha256": "1ab6ca5b1459306507b26eb47571eb5b4e5774c27d7ce69019574ce28c8df8ec",
-  "packed_sha256": "e244edfaabb58494df0a1c6fbd4100fc4b99c8c65e840f71bc7757bb717521f4",
+  "html_sha256": "903bf9ed1c45354505b92b3fdadae410ff0cd1ec26f340494ade4cc26fcba041",
+  "packed_sha256": "6e37c9b210495da45a6e5cbb3ff9759b65eac58be10da45740a2e8978a4880e1",
   "baseline": {
-    "framed_bytes": 2463,
-    "gzip_js_bytes": 1722,
-    "base64_bytes": 2296,
-    "html_unpacker_bytes": 165,
-    "commit": "31914fa"
+    "framed_bytes": 2471,
+    "commit": "d7aa3cd"
   },
-  "seed_bits": 19967,
+  "compression": "raw LZMA1 with end marker",
+  "compression_filters": [
+    {
+      "id": 4611686018427387905,
+      "dict_size": 8192,
+      "lc": 2,
+      "lp": 0,
+      "pb": 0,
+      "mode": 2,
+      "nice_len": 32,
+      "mf": 3,
+      "depth": 64
+    }
+  ],
+  "seed_bits": 19962,
   "seed_binary_bytes": 2496,
-  "seed_hex_file_bytes": 4995,
-  "constraint_rank": 19768,
-  "free_state_bits": 168,
-  "host": "CPython random + gzip loading infrastructure; browser WebGL1, highp fragment floats, OES_standard_derivatives and standard DOM; not CPU/OS-only",
+  "seed_hex_file_bytes": 4994,
+  "constraint_rank": 17656,
+  "free_state_bits": 2280,
+  "host": "CPython random + standard lzma loading infrastructure; browser WebGL1, highp fragment floats, OES_standard_derivatives and standard DOM; not CPU/OS-only",
   "python_version": "3.13.9",
-  "normal_launcher_bytes": 2257,
-  "stripped_launcher_bytes": 287,
-  "loader_bytes": 373
+  "normal_launcher_bytes": 2444,
+  "stripped_launcher_bytes": 377,
+  "loader_bytes": 472
 }

@@ -1,0 +1,99 @@
+{
+  "reference_commit": "d7aa3cd",
+  "reference_payload_bytes": 2471,
+  "selected_payload_bytes": 2207,
+  "saved_bytes": 264,
+  "remaining_bytes": 285,
+  "measurements": [
+    {
+      "document": "published_html",
+      "codec": "gzip",
+      "compressed_bytes": 2469,
+      "external_framing_bytes": 2,
+      "total_bytes": 2471
+    },
+    {
+      "document": "published_html",
+      "codec": "zlib",
+      "compressed_bytes": 2457,
+      "external_framing_bytes": 2,
+      "total_bytes": 2459
+    },
+    {
+      "document": "published_html",
+      "codec": "bz2",
+      "compressed_bytes": 2580,
+      "external_framing_bytes": 2,
+      "total_bytes": 2582
+    },
+    {
+      "document": "published_html",
+      "codec": "xz",
+      "compressed_bytes": 2468,
+      "external_framing_bytes": 2,
+      "total_bytes": 2470
+    },
+    {
+      "document": "published_html",
+      "codec": "lzma_alone",
+      "compressed_bytes": 2424,
+      "external_framing_bytes": 2,
+      "total_bytes": 2426
+    },
+    {
+      "document": "published_html",
+      "codec": "raw_lzma1",
+      "compressed_bytes": 2396,
+      "external_framing_bytes": 0,
+      "total_bytes": 2396
+    },
+    {
+      "document": "compact_html",
+      "codec": "gzip",
+      "compressed_bytes": 2292,
+      "external_framing_bytes": 2,
+      "total_bytes": 2294
+    },
+    {
+      "document": "compact_html",
+      "codec": "zlib",
+      "compressed_bytes": 2280,
+      "external_framing_bytes": 2,
+      "total_bytes": 2282
+    },
+    {
+      "document": "compact_html",
+      "codec": "bz2",
+      "compressed_bytes": 2399,
+      "external_framing_bytes": 2,
+      "total_bytes": 2401
+    },
+    {
+      "document": "compact_html",
+      "codec": "xz",
+      "compressed_bytes": 2292,
+      "external_framing_bytes": 2,
+      "total_bytes": 2294
+    },
+    {
+      "document": "compact_html",
+      "codec": "lzma_alone",
+      "compressed_bytes": 2247,
+      "external_framing_bytes": 2,
+      "total_bytes": 2249
+    },
+    {
+      "document": "compact_html",
+      "codec": "raw_lzma1",
+      "compressed_bytes": 2207,
+      "external_framing_bytes": 0,
+      "total_bytes": 2207
+    }
+  ],
+  "search": {
+    "reproducible_seed": 712,
+    "candidates_in_final_search": 20782,
+    "options": "Identifier allocation, standard LZMA properties/match finders/nice lengths/search depths; earlier checks also tried gzip, LZMA2, delta and BCJ filters."
+  },
+  "no_global_minimum_claim": true
+}

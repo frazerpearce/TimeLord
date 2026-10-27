@@ -1,0 +1,69 @@
+{
+  "glsl_identifiers": {
+    "terrain": "X",
+    "wind": "G",
+    "advect": "D",
+    "weatherKey": "L",
+    "clock": "F",
+    "age": "l",
+    "blend": "B",
+    "key": "Z",
+    "old": "I",
+    "drift": "P",
+    "amp": "m",
+    "sunDirection": "O",
+    "flash": "W",
+    "cloud": "e",
+    "rotation": "g",
+    "water": "o",
+    "land": "j",
+    "point": "A",
+    "normal": "U",
+    "solar": "M",
+    "light": "C",
+    "shell": "c",
+    "cover": "E",
+    "top": "K"
+  },
+  "js_identifiers": {
+    "shader": "A",
+    "type": "B",
+    "source": "C",
+    "uniform": "D",
+    "view": "E",
+    "seed": "F",
+    "auto": "G",
+    "start": "H",
+    "ease": "I",
+    "frame": "J",
+    "now": "K"
+  },
+  "reference_commit": "d7aa3cd",
+  "reference_html_sha256": "1ab6ca5b1459306507b26eb47571eb5b4e5774c27d7ce69019574ce28c8df8ec",
+  "syntax_options": {
+    "operator_whitespace": false,
+    "boolean_literals": true,
+    "implicit_public_globals": true
+  },
+  "lzma_filters": [
+    {
+      "id": 4611686018427387905,
+      "dict_size": 8192,
+      "lc": 2,
+      "lp": 0,
+      "pb": 0,
+      "mode": 2,
+      "nice_len": 32,
+      "mf": 3,
+      "depth": 64
+    }
+  ],
+  "webgl_constants": {
+    "VERTEX_SHADER": 35633,
+    "FRAGMENT_SHADER": 35632,
+    "ARRAY_BUFFER": 34962,
+    "STATIC_DRAW": 35044,
+    "FLOAT": 5126,
+    "TRIANGLES": 4
+  }
+}

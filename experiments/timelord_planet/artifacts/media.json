@@ -36,5 +36,12 @@
       "sha256": "451b18c15dc2cbfb19c9b91dde51093f3d1b161efaa874af1aece35913537ea6",
       "description": "Camera fixed at [1.28,-.095,1.2], seed 1; absolute weather time 0..24 s. Includes slow solar drift, ocean glint, twilight and independently timed local storm flashes."
     }
-  }
+  },
+  "reference_commit": "d7aa3cd",
+  "equivalent_compact_html_sha256": "903bf9ed1c45354505b92b3fdadae410ff0cd1ec26f340494ade4cc26fcba041",
+  "equivalence_reports": [
+    "browser-verification.json",
+    "webkit-verification.json"
+  ],
+  "note": "These existing movies were captured from main at d7aa3cd. Their original html_sha256 is retained. The compact production program passes exact pixel/view comparisons against that unchanged reference."
 }

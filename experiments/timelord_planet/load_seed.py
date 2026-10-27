@@ -1,9 +1,11 @@
-"""Generic two-byte-length binary TimeLord loader; no application logic."""
+"""Generic standard-library LZMA TimeLord loader; no application logic."""
 from pathlib import Path
-import gzip
-import random
-import sys
+import lzma,random,sys
 r=random.Random(int(Path(sys.argv[1]).read_text(),0))
-n=r.getrandbits(8)|r.getrandbits(8)<<8
-if not 0<n<=2490: raise ValueError('invalid frame')
-Path(sys.argv[2]).write_bytes(gzip.decompress(bytes(r.getrandbits(8) for _ in range(n))))
+d=lzma.LZMADecompressor(format=lzma.FORMAT_RAW,filters=[{'id':lzma.FILTER_LZMA1,'dict_size':8192,'lc':2,'lp':0,'pb':0}])
+b=b''
+for _ in range(2492):
+ b+=d.decompress(bytes([r.getrandbits(8)]))
+ if d.eof:break
+else:raise ValueError('invalid or oversized stream')
+Path(sys.argv[2]).write_bytes(b)
