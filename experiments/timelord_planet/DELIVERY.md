@@ -16,7 +16,9 @@ The browser no longer needs DecompressionStream or a base64 unpacking wrapper.
 
 Leave the mouse and trackpad untouched to watch the film. The camera holds A
 for five seconds, reveals the globe, visits B and returns to exactly the same
-ground view at 40 seconds. Clouds are present throughout and keep evolving.
+ground view at 40 seconds. Clouds are active throughout, with visible formation/dissipation and latitude-dependent
+trade-wind, westerly and polar flow bands. These are a visual approximation.
+A fixed sun lights the ground and clouds; the orbit reveals a genuine night side.
 After a three-second returned-A hold, the camera zooms out and smoothly enters
 an ongoing steady orbit. It does not restart the film automatically.
 
@@ -33,9 +35,9 @@ comments, checks, argument parsing or status output. Extract it, change into
 its directory and run `python3 timelord_planet.py`; it writes `planet.html` there.
 Both variants use the installed Python interpreter; neither bundles Python.
 
-The complete transported frame is **2,050 bytes**: a 2,048-byte gzip stream plus
-two-byte length. It recovers **4,250 bytes of executable HTML**. The physical
-integer is **19,964 bits / 2,496 binary bytes**, or **4,994 bytes** as hexadecimal
+The complete transported frame is **2,275 bytes**: a 2,273-byte gzip stream plus
+two-byte length. It recovers **4,784 bytes of executable HTML**. The physical
+integer is **19,966 bits / 2,496 binary bytes**, or **4,995 bytes** as hexadecimal
 text. Distribution ZIP sizes are separate measurements in `delivery.json`.
 
 `seed_planet.txt` is the large **TimeLord transport seed**, reconstructing the

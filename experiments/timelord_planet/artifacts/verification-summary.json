@@ -1,5 +1,5 @@
 {
-  "frame_bytes": 2050,
+  "frame_bytes": 2275,
   "limit_bytes": 2492,
   "original_timelord_tests_passed": 15,
   "delivery_tests_passed": 4,
@@ -27,5 +27,9 @@
     "webkit-verification.json",
     "delivery.json",
     "media.json"
-  ]
+  ],
+  "cloud_generations_smooth": true,
+  "cloud_evolution_on_moving_parcels": true,
+  "latitude_wind_bands": true,
+  "fixed_sun_day_night": true
 }

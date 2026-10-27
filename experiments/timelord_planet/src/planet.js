@@ -29,16 +29,26 @@ float terrain(vec3 p){
  }
  return h;
 }
-// Domain-separated weather: rigid wind rotation plus a slowly moving 3D slice.
-// Its absolute clock is independent of both camera stages and terrain.
+// Qualitative trade winds / westerlies / polar easterlies, smooth at all latitudes.
+float wind(float y){return .018*(-1.+6.*y*y-6.*y*y*y*y);}
+// Backward advection has bounded age, so jet shear cannot stretch clouds forever.
+vec3 advect(vec3 p,float age){
+ float a=-age*wind(p.y),x=cos(a),y=sin(a);
+ return mat3(x,0,-y,0,1,0,y,0,x)*p;
+}
+vec3 weatherKey(float k){return vec3(sin(k*1.3),cos(k*1.7),sin(k*1.9))*19.;}
+// Asynchronous 12-second generations: the old field exactly matches the next
+// generation's previous field at each handoff. Smooth weights avoid popping.
 float cloud(vec3 p){
- float x=cos(V.w*.009),y=sin(V.w*.009);
- p=mat3(x,0,-y,0,1,0,y,0,x)*p*8.+vec3(43,71,19);
- vec3 drift=vec3(sin(V.w*.017),cos(V.w*.013),sin(V.w*.011))*.7;
- float h=0.,a=.55,f=1.;
+ float clock=V.w/12.+N(p*3.+91.),k=floor(clock),age=fract(clock)*12.;
+ float blend=smoothstep(0.,1.,fract(clock));
+ vec3 a=advect(p,age)*8.+vec3(43,71,19),b=advect(p,age+12.)*8.+vec3(43,71,19);
+ vec3 key=weatherKey(k),old=weatherKey(k-1.);
+ vec3 drift=vec3(sin(V.w*.035),cos(V.w*.03),sin(V.w*.025))*1.2;
+ float h=0.,amp=.55,f=1.;
  for(int i=0;i<8;i++){
-  h+=a*N(p*f+drift)*(1.-smoothstep(.3,1.,f*V.z/R.y*32.));
-  f*=2.03;a*=.5;
+  h+=amp*mix(N(b*f+drift+old),N(a*f+drift+key),blend)*(1.-smoothstep(.3,1.,f*V.z/R.y*32.));
+  f*=2.03;amp*=.5;
  }
  return h;
 }
@@ -58,17 +68,20 @@ void main(){
   // Differential bump shading only; the ray intersection remains spherical.
   vec3 point=vec3(q,sqrt(max(0.,1.-r)))*(1.+max(h,0.)*.25);
   vec3 normal=normalize(cross(dFdx(point),dFdy(point)));
-  float light=.3+.7*max(0.,dot(normal,normalize(vec3(-.5,.7,1.))));
+  // Fixed planet-local sun: camera motion must not carry the light with it.
+  vec3 sun=normalize(vec3(1.,-.1,.3));
+  float day=smoothstep(-.02,.04,dot(n,sun));
+  float light=.018+.982*max(0.,dot(rotation*normal,sun))*day;
   col*=light;
-  col+=vec3(.2,.35,.5)*pow(r,8.)*.22;
+  col+=vec3(.2,.35,.5)*pow(r,8.)*.22*day;
  col=r<1.?col:vec3(.008,.015,.027);
  // Orthographic intersection with a separate shell at radius 1.012.
  vec3 shell=vec3(q,sqrt(max(0.,1.024144-r)));
  float d=cloud(rotation*shell/1.012);
- col*=1.-.23*smoothstep(.5,.72,cloud(normalize(n+vec3(-.5,.7,1.)*.012)))*step(r,1.);
+ col*=1.-.23*smoothstep(.5,.72,cloud(normalize(n+sun*.012)))*step(r,1.);
  vec3 top=shell*(1.+d*.04);
  vec3 cn=normalize(cross(dFdx(top),dFdy(top)));
- col=mix(col,vec3(.91,.95,1.)*(.6+.4*max(0.,dot(cn,normalize(vec3(-.5,.7,1.))))),.4*smoothstep(.5,.72,d)*(1.-smoothstep(1.02,1.024144,r)));
+ col=mix(col,vec3(.91,.95,1.)*(.018+.982*max(0.,dot(rotation*cn,sun))*smoothstep(-.02,.04,dot(rotation*normalize(shell),sun))),.5*smoothstep(.5,.72,d)*(1.-smoothstep(1.02,1.024144,r)));
  gl_FragColor=vec4(pow(col,vec3(.85)),1);
 }`.replace('precision highp float;','#extension GL_OES_standard_derivatives : enable\nprecision highp float;'));
 g.linkProgram(p);g.useProgram(p);

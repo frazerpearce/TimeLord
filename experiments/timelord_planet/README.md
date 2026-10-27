@@ -3,7 +3,7 @@
 *Custom-made luxury planet building.*
 
 **Works, fits, and was actually run offline from its reconstructed TimeLord
-integer seed.** The new complete frame is **2,050 bytes**, 442 below the
+integer seed.** The new complete frame is **2,275 bytes**, 217 below the
 2,492-byte information limit. The ground is unchanged. Clouds move and evolve
 through the original 40-second film, then the camera enters a sustained orbit.
 
@@ -41,7 +41,7 @@ Open the [recovered executable document](artifacts/planet.html), inspect
 [A](artifacts/A.png), [globe](artifacts/globe.png), [B](artifacts/B.png),
 [returned A with later weather](artifacts/A-return.png),
 [steady orbit](artifacts/orbit.png), or watch the
-[70-second film-to-orbit capture](artifacts/loop.mp4).
+[130-second film-to-orbit capture](artifacts/loop.mp4).
 
 ## Camera and weather timeline
 
@@ -90,21 +90,46 @@ Ground geometry remains a unit sphere with differential bump shading from that
 same filtered terrain field. It is not displaced geometry or a flight simulator.
 No field depends on camera traversal, and terrain has no time argument.
 
-Weather is a separate, domain-separated 3D field, deterministically selected
-by the world seed. It uses eight smoothly filtered octaves. A rigid wind
-rotation at .009 radians/s advects the field; three slowly changing sine/cosine
-offsets move its sampling slice through 3D, causing formation and dissipation
-beyond mere rigid advection. It is a pure function of local position, seed,
-filter footprint and absolute elapsed time. No PRNG state mutates during flight.
+Weather is a separate, domain-separated 3D field selected by the world seed,
+using eight smoothly filtered octaves. Clouds now visibly form and dissipate:
+two overlapping generations are smoothly blended, with a new generation every
+12 seconds and a spatially varying phase to avoid synchronized global pulsing.
+Each generation samples a distinct deterministic noise domain. Continuous
+sampling-slice drift adds deformation within a generation. The old field exactly
+matches the next generation's previous field at handoff; zero blend derivatives
+prevent popping. Cloud ages are bounded to 24 seconds, avoiding indefinitely
+stretched streaks under differential winds.
+
+Wind depends on `y=sin(latitude)` through
+`wind(y)=.018*(-1+6*y*y-6*y*y*y*y)` radians/s. Backward advection uses the opposite
+angle for lookup, so actual flow is westward near the equator, eastward at middle
+latitudes and westward near the poles. Sign changes occur at approximately 27.4
+and 62.6 degrees in both hemispheres. Tangential motion naturally vanishes at
+the poles. These are qualitative trades/westerlies/polar-easterlies bands, not
+a numerical integration of Coriolis forces or a physical atmosphere model.
+The [24-second fixed-view weather clip](artifacts/weather.mp4) makes formation
+and dissipation visible separately from camera motion.
+
+All weather is a pure function of local position, seed, filter footprint and
+absolute time; no stateful random draws occur while running.
 
 Clouds are sampled at orthographic intersections with a shell of radius 1.012,
-creating parallax relative to the ground. Opacity is capped at .4, allowing the
+creating parallax relative to the ground. Opacity is capped at .5, allowing the
 ground to remain visible even under cloud banks. Filtered cloud height also
 provides differential cloud-top lighting. A displaced sample of the same field
 provides a compact approximate ground shadow. The cloud surface is thin and
 bump-shaded: there is no volume, multiple scattering or volumetric ray marching.
 Clear local views can occur naturally. The cloud renderer is active from the
 first image and never switches off at camera transitions.
+
+
+Lighting uses one fixed planet-local sun direction, `normalize([1,-.1,.3])`.
+Ground and cloud bump normals are rotated into planet coordinates before lighting;
+the cloud-shadow lookup uses this same direction. A terminator mask prevents
+back-facing bumps or clouds from glowing on the night side. Ambient illumination
+is 1.8%, and the atmospheric rim fades with sunlight. The camera can orbit into
+night without dragging the light along. The planet itself is not spinning, so a
+fixed ground location has constant solar illumination apart from cloud shadows.
 
 Both fields use Cartesian sphere coordinates, with no longitude texture seam
 or pole singularity. All derivative calculations run outside divergent masks.
@@ -113,11 +138,11 @@ Ground and cloud masks are applied after derivative evaluation.
 `draw(t)` supplies the same absolute `t` to the camera and weather. Returning to
 A reproduces the **ground and camera**, not the complete weather composite.
 The cloud clock remains continuous at 40, 43, 48 and 52 seconds. On the tested
-Chromium backend the initial/returned ground-only RGBA hash is unchanged even
-from the old version:
+Chromium backend the initial/returned ground-only RGBA hash is identical. It
+differs from the previous release because illumination has changed:
 
 ```text
-822b6d61c1200c7890de13d822f20dd543589b88f95f0772d684cd5eab25f154
+52410181989a097e10c9ecaf14c492c1b0d500d2f92f04dc48fc6fedc78a4d1e
 ```
 
 ## Scale and numerical limits
@@ -181,21 +206,21 @@ No graphics assets, libraries or network calls are needed.
 
 | Measurement | Bytes |
 |---|---:|
-| Readable JavaScript, comments included | 5,236 |
-| Raw HTML with readable JavaScript | 5,259 |
-| Minified JavaScript/shaders | 4,227 |
-| Complete executable minified HTML | 4,250 |
-| Binary gzip stream, including header/trailer | 2,048 |
+| Readable JavaScript, comments included | 6,037 |
+| Raw HTML with readable JavaScript | 6,060 |
+| Minified JavaScript/shaders | 4,761 |
+| Complete executable minified HTML | 4,784 |
+| Binary gzip stream, including header/trailer | 2,273 |
 | Length framing | 2 |
-| **Complete transported frame** | **2,050** |
-| **Room remaining under 2,492** | **442** |
+| **Complete transported frame** | **2,275** |
+| **Room remaining under 2,492** | **217** |
 | Minimal generic reconstruction loader | 373 |
 | Normal launcher | 2,257 |
 | Stripped launcher | 287 |
 | Physical integer binary storage | 2,496 |
-| Physical integer hexadecimal text file | 4,994 |
+| Physical integer hexadecimal text file | 4,995 |
 
-The seed has **19,964 bits**. `artifacts/sizes.json` contains authoritative
+The seed has **19,966 bits**. `artifacts/sizes.json` contains authoritative
 machine-readable values and hashes. Distribution ZIP sizes/hashes are recorded
 separately in `artifacts/delivery.json`; they are not claimed to fit in the seed.
 `frame.bin` and `planet.html.gz` are the actual transported frame and gzip body.
@@ -203,9 +228,10 @@ separately in `artifacts/delivery.json`; they are not claimed to fit in the seed
 The old package used 1,722 gzip bytes expanded into 2,296 base64 bytes, plus a
 165-byte HTML browser unpacker and two-byte frame: **2,463 bytes**. Repacking
 that unchanged old scene as binary-compressed complete HTML measured **1,740**
-framed bytes, freeing 723 bytes. Adding clouds, shadows, lighting, the orbital
-transition and Space-only restart costs 310 compressed bytes, yielding **2,050**.
-This is 413 bytes smaller than the previous, simpler delivery. No minimum-size
+framed bytes, freeing 723 bytes. The current weather, latitude winds, fixed-sun lighting, orbital
+transition and Space-only restart add 535 compressed bytes, yielding **2,275**.
+This is 188 bytes smaller than the original delivery, and 225 bytes larger than
+the preceding 2,050-byte cloud/orbit version (commit `90dc33b`). No minimum-size
 claim is made.
 
 ## Identity and integration
@@ -271,8 +297,9 @@ The browser checks load only recovered recipient HTML. They verify exact
 camera/ground-only frame endpoints, changing composites, seeded field purity,
 cloud evolution beyond rigid advection, spatial/time continuity, seam/poles,
 coarse/fine stability, six seeds, eight fixed locations, exact view restoration,
-controls, continuous weather time, smooth orbit acceleration, sustained angular
-speed and fixed globe size. Both normal and stripped recovered documents are
+controls, continuous weather time, smooth generation handoffs, latitude wind signs and
+hemisphere symmetry, day/night brightness under the fixed sun, smooth orbit
+acceleration, sustained angular speed and fixed globe size. Both normal and stripped recovered documents are
 opened. Diagnostic ground shaders remove only the transported cloud/shadow
 compositing block; diagnostic field shaders reuse actual transported field code.
 No missing application algorithms come from the verifier.
@@ -283,15 +310,17 @@ Both checks require no requests beyond the recovered local HTML. Reports identif
 this distinction, backend, hashes, numerical samples, timing and any errors.
 The script's actual requestAnimationFrame callback is also exercised.
 
-To capture all 40 seconds, the return hold/reveal and ongoing orbit at 12fps:
+To capture the film, a complete day/night orbit and a fixed-view weather clip:
 
 ```sh
 python3 verify.py --browser "$PLANET_NODE" --video
 ffmpeg -y -framerate 12 -i artifacts/frames/%04d.png \
   -c:v libx264 -crf 20 -pix_fmt yuv420p -movflags +faststart artifacts/loop.mp4
+ffmpeg -y -framerate 12 -i artifacts/weather-frames/%04d.png \
+  -c:v libx264 -crf 20 -pix_fmt yuv420p -movflags +faststart artifacts/weather.mp4
 ```
 
-The delivered video lasts 70 seconds at 960×640; the interactive version uses
+The delivered video lasts 130 seconds at 960×640; the interactive version uses
 browser animation frames. Capture PNGs can be deleted after encoding. The video
 and snapshots are outputs only, never runtime inputs. Browser and video tools
 are development dependencies, not application assets.

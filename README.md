@@ -344,8 +344,10 @@ launcher, with no checks, comments, argument parsing or status output. Extract
 it, enter its directory, and run `python3 timelord_planet.py`.
 
 The original 40-second film holds at A, reveals the globe, visits B and returns
-to exactly the original ground/camera state. Procedural clouds move and evolve
-throughout. After a three-second return hold, the camera reveals the globe and
+to exactly the original ground/camera state. Clouds regenerate through smoothly blended, overlapping weather generations.
+Latitude-dependent winds produce qualitative trade-wind, westerly and polar
+bands, without accumulating indefinite shear. A sun fixed in planet coordinates
+lights both the ground and clouds, so the orbit passes through day and night. After a three-second return hold, the camera reveals the globe and
 smoothly enters a continuing steady orbit; it does not restart automatically.
 
 **Leave the mouse/trackpad untouched to watch.** Dragging or scrolling pauses
@@ -364,10 +366,10 @@ Use a matching seed and launcher: the older loader expected direct HTML.
 Existing download paths remain supported; version 1 is preserved at commit
 `31914fa`.
 
-The complete framed payload is **2,050 bytes**, including its two-byte length
-and gzip header/trailer—413 bytes less than the previous base64-in-HTML version,
-even with clouds and the orbit added. It expands to **4,250 HTML bytes**. The
-physical transport integer is **19,964 bits / 2,496 binary bytes**, or 4,994 bytes
+The complete framed payload is **2,275 bytes**, including its two-byte length
+and gzip header/trailer—188 bytes less than the previous base64-in-HTML version,
+even with clouds and the orbit added. It expands to **4,784 HTML bytes**. The
+physical transport integer is **19,966 bits / 2,496 binary bytes**, or 4,995 bytes
 as hexadecimal text. The generated world's unsigned 32-bit identity is `1`,
 which is distinct from the large TimeLord transport seed.
 
@@ -379,7 +381,8 @@ Terrain is shaded on a sphere and clouds use a separate thin shell. Detail is
 finite, with a 48x film reveal and tested 200x exploration range.
 
 Chromium 151 and WebKit 26.5 checks verify exact ground-only return frames,
-continuous evolving weather, sustained orbital motion, six seeds, eight fixed
+smooth cloud-generation handoffs, evolution along moving air parcels, latitude
+wind signs, fixed-sun day/night brightness, sustained orbital motion, six seeds, eight fixed
 locations and both recipient distributions. WebKit's network requests are
 blocked by routes because its offline switch rejects local files on this host.
 Fields and pixels are deterministic on a given backend; cross-GPU identity is
@@ -392,7 +395,8 @@ source, reproduction commands, accounting, integration and limitations. View
 [B](experiments/timelord_planet/artifacts/B.png),
 [returned A with later clouds](experiments/timelord_planet/artifacts/A-return.png),
 [steady orbit](experiments/timelord_planet/artifacts/orbit.png), or the
-[70-second film-to-orbit video](experiments/timelord_planet/artifacts/loop.mp4).
+[130-second day/night orbit video](experiments/timelord_planet/artifacts/loop.mp4),
+or the [24-second fixed-view weather clip](experiments/timelord_planet/artifacts/weather.mp4).
 
 ---
 

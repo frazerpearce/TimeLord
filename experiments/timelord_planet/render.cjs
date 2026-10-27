@@ -44,7 +44,12 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
    g.readPixels(0,0,g.drawingBufferWidth,g.drawingBufferHeight,g.RGBA,g.UNSIGNED_BYTE,bytes);
    const digest=await crypto.subtle.digest('SHA-256',bytes);
    const hash=Array.from(new Uint8Array(digest)).map(x=>x.toString(16).padStart(2,'0')).join('');
-   p=obs.app;g.useProgram(p);return {view,hash};
+   let luminance=0,count=0;const w=g.drawingBufferWidth,h=g.drawingBufferHeight;
+   for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+    const qx=(2*x+1-w)/h*view[2],qy=(2*y+1-h)/h*view[2];
+    if(qx*qx+qy*qy<.81){const i=(y*w+x)*4;luminance+=.2126*bytes[i]+.7152*bytes[i+1]+.0722*bytes[i+2];count++;}
+   }
+   p=obs.app;g.useProgram(p);return {view,hash,mean_luminance:luminance/count};
   },{time,ground});
  }
  const initial=await render(0),returned=await render(40);
@@ -53,7 +58,7 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
  assert.equal(groundInitial.hash,groundReturn.hash,'exact ground-only endpoint pixels');
  if(engine==='chromium')await page.screenshot({path:out+'/ground-A-return.png'});
  const captures={};
- for(const [name,t]of [['A',0],['globe',10],['B',20],['A-return',40],['orbit-start',48],['orbit',60],['orbit-later',75]]){
+ for(const [name,t]of [['A',0],['globe',10],['B',20],['A-return',40],['orbit-start',48],['orbit',60],['orbit-later',75],['terminator',80],['night',100],['dawn',120]]){
   captures[name]={time:t,...await render(t)};
   if(engine==='chromium')await page.screenshot({path:out+'/'+name+'.png'});
  }
@@ -73,14 +78,17 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
  const field=await page.evaluate(()=>{
   const prefix=obs.source.split('void main()')[0];
   const probes=[obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(clamp(terrain(P)+.5,0.,1.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
-                obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(clamp(cloud(P),0.,1.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`)];
-  function sample(point,weather=false,seed=1,zoom=.025,time=0){
-   const prog=probes[+weather];g.useProgram(prog);g.viewport(0,0,1,1);
+                obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(clamp(cloud(P),0.,1.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
+                obs.compile(prefix+`uniform vec3 P;void main(){float v=floor((wind(P.y)*16.+.5)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
+                obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(N(P*3.+91.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
+                obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(clamp(cloud(advect(P,-V.w)),0.,1.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`)];
+  function sample(point,weather=false,seed=1,zoom=.025,time=0,kind=+weather){
+   const prog=probes[kind];g.useProgram(prog);g.viewport(0,0,1,1);
    const uniform=n=>g.getUniformLocation(prog,n);
    g.uniform3fv(uniform('P'),point);g.uniform2f(uniform('R'),960,640);
    g.uniform2f(uniform('S'),seed&65535,seed>>>16);g.uniform4f(uniform('V'),0,0,zoom,time);
    g.drawArrays(g.TRIANGLES,0,3);const bytes=new Uint8Array(4);g.readPixels(0,0,1,1,g.RGBA,g.UNSIGNED_BYTE,bytes);
-   return (bytes[0]*256+bytes[1])/65535-(weather?0:.5);
+   const value=(bytes[0]*256+bytes[1])/65535;return kind===0?value-.5:kind===2?(value-.5)/16:value;
   }
   const point=(x,y)=>[Math.sin(x)*Math.cos(y),Math.sin(y),Math.cos(x)*Math.cos(y)];
   const coords=[[.4,.3],[2.2,-.45],[-1,.6],[0,0],[3,-1],[1,1.3],[0,Math.PI/2],[0,-Math.PI/2]];
@@ -96,11 +104,15 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
   const seam=[false,true].map(weather=>Math.abs(sample(point(-Math.PI,.2),weather)-sample(point(Math.PI,.2),weather)));
   const poles=[false,true].map(weather=>[-1,1].map(sign=>Math.max(...[-3,-1,0,1,3].map(x=>Math.abs(sample(point(x,sign*Math.PI/2),weather)-sample([0,sign,0],weather))))));
   const spatial=[false,true].map(weather=>coords.map(([x,y])=>Math.abs(sample(point(x+1e-6,y),weather)-sample(point(x,y),weather))));
-  const windAngle=40*.009,x=Math.cos(windAngle),y=Math.sin(windAngle);
-  const purelyAdvected=points.map(([a,b,c])=>sample([x*a+y*c,b,-y*a+x*c],true));
-  const evolved=points.map(v=>sample(v,true,1,.025,40));
+  const windRates=[-1,-Math.SQRT1_2,0,Math.SQRT1_2,1].map(y=>({y,rate:sample([0,y,0],true,1,.025,0,2)}));
+  const handoffs=points.map(v=>{
+   const phase=sample(v,true,1,.025,0,3),time=12*(1-phase);
+   return {time,before:sample(v,true,1,.025,time-.001),after:sample(v,true,1,.025,time+.001)};
+  });
+  const materialTimes=[0,3,12,40].map(time=>({time,values:points.map(v=>sample(v,true,1,.025,time,4))}));
+  const purelyAdvected=cloud,evolved=materialTimes[3].values;
   g.useProgram(obs.app);
-  return {coords,ground,cloud,groundTime,groundReverse,cloudReverse,coarse,fine,cloudCoarse,cloudFine,seeds,weatherTimes,seam,poles,spatial,purelyAdvected,evolved};
+  return {coords,ground,cloud,groundTime,groundReverse,cloudReverse,coarse,fine,cloudCoarse,cloudFine,seeds,weatherTimes,seam,poles,spatial,purelyAdvected,evolved,windRates,handoffs,materialTimes};
  });
  assert.deepStrictEqual(field.ground,field.groundReverse);assert.deepStrictEqual(field.cloud,field.cloudReverse);
  assert(field.groundTime.every(values=>JSON.stringify(values)===JSON.stringify(field.ground)));
@@ -114,6 +126,11 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
  assert(maxDelta(field.weatherTimes[4].values,field.weatherTimes[6].values)<.001);
  const evolution=maxDelta(field.purelyAdvected,field.evolved);assert(evolution>.001,'formation/evolution beyond wind alone');
  assert(maxDelta(field.cloud,field.evolved)>.01);
+ assert(field.windRates[0].rate<0&&field.windRates[1].rate>0&&field.windRates[2].rate<0&&field.windRates[3].rate>0&&field.windRates[4].rate<0);
+ assert(Math.abs(field.windRates[0].rate-field.windRates[4].rate)<2/65535);
+ assert(Math.abs(field.windRates[1].rate-field.windRates[3].rate)<2/65535);
+ assert(field.handoffs.every(x=>Math.abs(x.before-x.after)<.001),'smooth cloud-generation handoff');
+ assert(maxDelta(field.materialTimes[0].values,field.materialTimes[1].values)>.01,'visible evolution in three seconds, not advection alone');
  const seedRenders=[];
  for(const identity of field.seeds.map(x=>x.seed)){
   await page.evaluate(s=>planet(s,.4,.3,1.2),identity);
@@ -127,6 +144,16 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
   locations.push({coordinate:coord,...r});if(engine==='chromium'&&i>=2)await page.screenshot({path:out+'/location-'+i+'.png'});
  }
  await page.evaluate(()=>planet(1,.4,.3,.025));assert.equal((await render(0)).hash,initial.hash);
+ const fixedSun=await page.evaluate(()=>obs.source.match(/vec3 sun=normalize\(vec3\(([^)]+)\)\)/)[1].split(',').map(Number));
+ const sunView=[Math.atan2(fixedSun[0],fixedSun[2]),Math.atan2(fixedSun[1],Math.hypot(fixedSun[0],fixedSun[2]))];
+ const lighting={sun_direction:fixedSun};
+ await page.evaluate(([x,y])=>planet(1,x,y,1.2),sunView);
+ lighting.dayGround=await render(0,true);lighting.dayClouds=await render(0);
+ await page.evaluate(([x,y])=>planet(1,x+Math.PI,-y,1.2),sunView);
+ lighting.nightGround=await render(0,true);lighting.nightClouds=await render(0);
+ assert(lighting.dayGround.mean_luminance>8*lighting.nightGround.mean_luminance);
+ assert(lighting.dayClouds.mean_luminance>8*lighting.nightClouds.mean_luminance);
+ assert(lighting.nightClouds.mean_luminance<10,'night clouds must not remain white');
  const controls=await page.evaluate(()=>{
   planet(42,.4,.3,.025);onwheel({deltaY:-100});const wheel=[...draw(8)];
   document.querySelector('canvas').onpointermove({buttons:1,movementX:30,movementY:10});const drag=[...draw(9)];
@@ -173,13 +200,17 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
  }
  assert.deepStrictEqual(errors,[]);assert(requests.every(url=>url===target));
  assert.equal(await page.evaluate(()=>g.getError()),0);assert.equal(await page.evaluate(()=>g.isContextLost()),false);
- const report={engine,browser:browser.version(),...diagnostic,offline:true,network_protection:engine==='chromium'?'browser offline':'HTTP(S) routes aborted',requests,errors,initial,returned,groundInitial,groundReturn,ground_endpoint_frame_equal:true,composite_endpoint_frame_equal:false,captures,choreography,field,coarse_max_error:coarseError,finer_detail_max_change:fineReveal,evolution_beyond_advection:evolution,seedRenders,locations,controls,clock,opening_cloud_motion:openingChanged,globe_cloud_motion:globeWeatherMoves,timing,animation,distributionSmoke};
+ const report={engine,browser:browser.version(),...diagnostic,offline:true,network_protection:engine==='chromium'?'browser offline':'HTTP(S) routes aborted',requests,errors,initial,returned,groundInitial,groundReturn,ground_endpoint_frame_equal:true,composite_endpoint_frame_equal:false,captures,choreography,field,coarse_max_error:coarseError,finer_detail_max_change:fineReveal,evolution_beyond_advection:evolution,seedRenders,locations,lighting,controls,clock,opening_cloud_motion:openingChanged,globe_cloud_motion:globeWeatherMoves,timing,animation,distributionSmoke};
  fs.writeFileSync(out+'/'+(engine==='chromium'?'browser-verification.json':'webkit-verification.json'),JSON.stringify(report,null,2)+'\n');
  console.log(JSON.stringify({engine,ground_endpoint_equal:true,clouds_evolve:true,coarseError,fineReveal,timing,framed_bytes:JSON.parse(fs.readFileSync(out+'/sizes.json')).total_framed_bytes}));
  if(process.argv.includes('--video')){
   await page.evaluate(()=>planet(1));await page.keyboard.press('Space');
   const dir=path.join(out,'frames');fs.mkdirSync(dir,{recursive:true});
-  for(let i=0;i<840;i++){await page.evaluate(t=>{draw(t);g.finish()},i/12);await page.screenshot({path:path.join(dir,String(i).padStart(4,'0')+'.png')});}
+  for(let i=0;i<1560;i++){await page.evaluate(t=>{draw(t);g.finish()},i/12);await page.screenshot({path:path.join(dir,String(i).padStart(4,'0')+'.png')});}
+  // Fixed ground and camera make formation/dissipation easy to distinguish from wind.
+  await page.evaluate(()=>planet(1,1.28,-.095,1.2));
+  const weatherDir=path.join(out,'weather-frames');fs.mkdirSync(weatherDir,{recursive:true});
+  for(let i=0;i<288;i++){await page.evaluate(t=>{draw(t);g.finish()},i/12);await page.screenshot({path:path.join(weatherDir,String(i).padStart(4,'0')+'.png')});}
  }
  }finally{await browser.close();}
 })().catch(error=>{console.error(error);process.exit(1)});
