@@ -32,14 +32,18 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
   // Remove the shell, shadow and composite block ONLY, retaining actual ground rendering.
   const groundSource=source.replace(/vec3 shell=[\s\S]*?(?=gl_FragColor=)/,'');
   if(groundSource===source||groundSource.includes('col*=1.-.23'))throw Error('ground extraction failed');
-  window.obs={app:p,source,compile,ground:compile(groundSource)};
+  const frozenGround=groundSource.replace('sunDirection(V.w)','sunDirection(0.)');
+  const noGlint=frozenGround.replace(/col\+=vec3\(1\.,\.8,\.5\)[^;]+;/,'');
+  const noFlash=source.replace(/col\+=vec3\(\.3,\.4,\.7\)[^;]+;/,'');
+  if(noFlash===source||noGlint===frozenGround)throw Error('effect extraction failed');
+  window.obs={app:p,source,compile,ground:compile(frozenGround),groundActual:compile(groundSource),noGlint:compile(noGlint),noFlash:compile(noFlash)};
   const debug=g.getExtension('WEBGL_debug_renderer_info');
   return {shaders:g.getAttachedShaders(p).map(s=>({ok:g.getShaderParameter(s,g.COMPILE_STATUS),log:g.getShaderInfoLog(s)})),linked:g.getProgramParameter(p,g.LINK_STATUS),renderer:debug?g.getParameter(debug.UNMASKED_RENDERER_WEBGL):g.getParameter(g.RENDERER)};
  });
  assert(diagnostic.linked&&diagnostic.shaders.every(s=>s.ok));
  async function render(time,ground=false){
   return await page.evaluate(async({time,ground})=>{
-   p=ground?obs.ground:obs.app;g.useProgram(p);
+   p=ground==='actual'?obs.groundActual:ground==='no-glint'?obs.noGlint:ground==='no-flash'?obs.noFlash:ground?obs.ground:obs.app;g.useProgram(p);
    const view=[...draw(time)],bytes=new Uint8Array(g.drawingBufferWidth*g.drawingBufferHeight*4);
    g.readPixels(0,0,g.drawingBufferWidth,g.drawingBufferHeight,g.RGBA,g.UNSIGNED_BYTE,bytes);
    const digest=await crypto.subtle.digest('SHA-256',bytes);
@@ -55,7 +59,8 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
  const initial=await render(0),returned=await render(40);
  assert.deepStrictEqual(initial.view,returned.view);assert.notEqual(initial.hash,returned.hash,'weather should have evolved');
  const groundInitial=await render(0,true),groundReturn=await render(40,true);
- assert.equal(groundInitial.hash,groundReturn.hash,'exact ground-only endpoint pixels');
+ assert.equal(groundInitial.hash,groundReturn.hash,'exact terrain return with solar time held fixed');
+ const solarReturn=await render(40,'actual');assert.notEqual(groundInitial.hash,solarReturn.hash,'solar illumination must advance');
  if(engine==='chromium')await page.screenshot({path:out+'/ground-A-return.png'});
  const captures={};
  for(const [name,t]of [['A',0],['globe',10],['B',20],['A-return',40],['orbit-start',48],['orbit',60],['orbit-later',75],['terminator',80],['night',100],['dawn',120]]){
@@ -81,14 +86,15 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
                 obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(clamp(cloud(P),0.,1.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
                 obs.compile(prefix+`uniform vec3 P;void main(){float v=floor((wind(P.y)*16.+.5)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
                 obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(N(P*3.+91.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
-                obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(clamp(cloud(advect(P,-V.w)),0.,1.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`)];
+                obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(clamp(cloud(advect(P,-V.w)),0.,1.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
+                ...['x','y','z'].map(axis=>obs.compile(prefix+`uniform vec3 P;void main(){float v=floor((sunDirection(V.w).${axis}*.5+.5)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`))];
   function sample(point,weather=false,seed=1,zoom=.025,time=0,kind=+weather){
    const prog=probes[kind];g.useProgram(prog);g.viewport(0,0,1,1);
    const uniform=n=>g.getUniformLocation(prog,n);
    g.uniform3fv(uniform('P'),point);g.uniform2f(uniform('R'),960,640);
    g.uniform2f(uniform('S'),seed&65535,seed>>>16);g.uniform4f(uniform('V'),0,0,zoom,time);
    g.drawArrays(g.TRIANGLES,0,3);const bytes=new Uint8Array(4);g.readPixels(0,0,1,1,g.RGBA,g.UNSIGNED_BYTE,bytes);
-   const value=(bytes[0]*256+bytes[1])/65535;return kind===0?value-.5:kind===2?(value-.5)/16:value;
+   const value=(bytes[0]*256+bytes[1])/65535;return kind===0?value-.5:kind===2?(value-.5)/16:kind>=5?2*value-1:value;
   }
   const point=(x,y)=>[Math.sin(x)*Math.cos(y),Math.sin(y),Math.cos(x)*Math.cos(y)];
   const coords=[[.4,.3],[2.2,-.45],[-1,.6],[0,0],[3,-1],[1,1.3],[0,Math.PI/2],[0,-Math.PI/2]];
@@ -111,8 +117,9 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
   });
   const materialTimes=[0,3,12,40].map(time=>({time,values:points.map(v=>sample(v,true,1,.025,time,4))}));
   const purelyAdvected=cloud,evolved=materialTimes[3].values;
+  const suns=[0,40,400].map(time=>({time,vector:[5,6,7].map(kind=>sample([0,0,0],true,1,.025,time,kind))}));
   g.useProgram(obs.app);
-  return {coords,ground,cloud,groundTime,groundReverse,cloudReverse,coarse,fine,cloudCoarse,cloudFine,seeds,weatherTimes,seam,poles,spatial,purelyAdvected,evolved,windRates,handoffs,materialTimes};
+  return {suns,coords,ground,cloud,groundTime,groundReverse,cloudReverse,coarse,fine,cloudCoarse,cloudFine,seeds,weatherTimes,seam,poles,spatial,purelyAdvected,evolved,windRates,handoffs,materialTimes};
  });
  assert.deepStrictEqual(field.ground,field.groundReverse);assert.deepStrictEqual(field.cloud,field.cloudReverse);
  assert(field.groundTime.every(values=>JSON.stringify(values)===JSON.stringify(field.ground)));
@@ -144,7 +151,9 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
   locations.push({coordinate:coord,...r});if(engine==='chromium'&&i>=2)await page.screenshot({path:out+'/location-'+i+'.png'});
  }
  await page.evaluate(()=>planet(1,.4,.3,.025));assert.equal((await render(0)).hash,initial.hash);
- const fixedSun=await page.evaluate(()=>obs.source.match(/vec3 sun=normalize\(vec3\(([^)]+)\)\)/)[1].split(',').map(Number));
+ const fixedSun=field.suns[0].vector;
+ assert(maxDelta(field.suns[0].vector,field.suns[1].vector)>.1,'terminator advances over the film');
+ assert(Math.abs(field.suns[0].vector[1]-field.suns[2].vector[1])<2/65535);
  const sunView=[Math.atan2(fixedSun[0],fixedSun[2]),Math.atan2(fixedSun[1],Math.hypot(fixedSun[0],fixedSun[2]))];
  const lighting={sun_direction:fixedSun};
  await page.evaluate(([x,y])=>planet(1,x,y,1.2),sunView);
@@ -154,6 +163,21 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
  assert(lighting.dayGround.mean_luminance>8*lighting.nightGround.mean_luminance);
  assert(lighting.dayClouds.mean_luminance>8*lighting.nightClouds.mean_luminance);
  assert(lighting.nightClouds.mean_luminance<10,'night clouds must not remain white');
+ const glints=[];
+ for(const longitude of [-1,0,1,2,3,4]){
+  await page.evaluate(x=>planet(1,x,.3,1.2),longitude);
+  const on=await render(0,true),off=await render(0,'no-glint');
+  glints.push({longitude,added_luminance:on.mean_luminance-off.mean_luminance});
+ }
+ assert(glints.some(x=>x.added_luminance>.01),'ocean reflection must contribute visibly');
+ const flashes=[];
+ await page.evaluate(()=>planet(1,4.4,.1,1.2));
+ for(const time of [80,84.3,86,90,93.3,95,99.3,102,104.3,108,111.3,115,120]){
+  const on=await render(time),off=await render(time,'no-flash');
+  flashes.push({time,added_luminance:on.mean_luminance-off.mean_luminance});
+ }
+ assert(flashes.some(x=>x.added_luminance>0),'occasional night lightning must be visible');
+ assert(flashes.some(x=>x.added_luminance<.00001),'lightning must turn off between flashes');
  const controls=await page.evaluate(()=>{
   planet(42,.4,.3,.025);onwheel({deltaY:-100});const wheel=[...draw(8)];
   document.querySelector('canvas').onpointermove({buttons:1,movementX:30,movementY:10});const drag=[...draw(9)];
@@ -200,9 +224,9 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
  }
  assert.deepStrictEqual(errors,[]);assert(requests.every(url=>url===target));
  assert.equal(await page.evaluate(()=>g.getError()),0);assert.equal(await page.evaluate(()=>g.isContextLost()),false);
- const report={engine,browser:browser.version(),...diagnostic,offline:true,network_protection:engine==='chromium'?'browser offline':'HTTP(S) routes aborted',requests,errors,initial,returned,groundInitial,groundReturn,ground_endpoint_frame_equal:true,composite_endpoint_frame_equal:false,captures,choreography,field,coarse_max_error:coarseError,finer_detail_max_change:fineReveal,evolution_beyond_advection:evolution,seedRenders,locations,lighting,controls,clock,opening_cloud_motion:openingChanged,globe_cloud_motion:globeWeatherMoves,timing,animation,distributionSmoke};
+ const report={engine,browser:browser.version(),...diagnostic,offline:true,network_protection:engine==='chromium'?'browser offline':'HTTP(S) routes aborted',requests,errors,initial,returned,groundInitial,groundReturn,solarReturn,ground_endpoint_frame_equal_with_frozen_sun:true,composite_endpoint_frame_equal:false,captures,choreography,field,coarse_max_error:coarseError,finer_detail_max_change:fineReveal,evolution_beyond_advection:evolution,seedRenders,locations,lighting,glints,flashes,controls,clock,opening_cloud_motion:openingChanged,globe_cloud_motion:globeWeatherMoves,timing,animation,distributionSmoke};
  fs.writeFileSync(out+'/'+(engine==='chromium'?'browser-verification.json':'webkit-verification.json'),JSON.stringify(report,null,2)+'\n');
- console.log(JSON.stringify({engine,ground_endpoint_equal:true,clouds_evolve:true,coarseError,fineReveal,timing,framed_bytes:JSON.parse(fs.readFileSync(out+'/sizes.json')).total_framed_bytes}));
+ console.log(JSON.stringify({engine,ground_endpoint_equal_with_frozen_sun:true,clouds_evolve:true,coarseError,fineReveal,timing,framed_bytes:JSON.parse(fs.readFileSync(out+'/sizes.json')).total_framed_bytes}));
  if(process.argv.includes('--video')){
   await page.evaluate(()=>planet(1));await page.keyboard.press('Space');
   const dir=path.join(out,'frames');fs.mkdirSync(dir,{recursive:true});

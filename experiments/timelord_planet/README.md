@@ -3,7 +3,7 @@
 *Custom-made luxury planet building.*
 
 **Works, fits, and was actually run offline from its reconstructed TimeLord
-integer seed.** The new complete frame is **2,275 bytes**, 217 below the
+integer seed.** The new complete frame is **2,443 bytes**, 49 below the
 2,492-byte information limit. The ground is unchanged. Clouds move and evolve
 through the original 40-second film, then the camera enters a sustained orbit.
 
@@ -123,27 +123,47 @@ Clear local views can occur naturally. The cloud renderer is active from the
 first image and never switches off at camera transitions.
 
 
-Lighting uses one fixed planet-local sun direction, `normalize([1,-.1,.3])`.
-Ground and cloud bump normals are rotated into planet coordinates before lighting;
-the cloud-shadow lookup uses this same direction. A terminator mask prevents
-back-facing bumps or clouds from glowing on the night side. Ambient illumination
-is 1.8%, and the atmospheric rim fades with sunlight. The camera can orbit into
-night without dragging the light along. The planet itself is not spinning, so a
-fixed ground location has constant solar illumination apart from cloud shadows.
+Lighting uses a distant, inertially fixed sun. In the planet's rotating local
+frame it starts at `normalize([1,-.1,.3])` and drifts west at .004 radians/s,
+equivalent to a planetary rotation period of about 26.18 minutes in demo time.
+The ground coordinates remain fixed to the surface; the terminator advances
+without rotating or regenerating the terrain field. Camera orbital speed is
+independent of this solar drift.
+
+Ground and cloud normals use the same solar direction, as does the shadow
+lookup. Ocean-only specular reflection gives a warm sun-glint; an analytic rim
+changes from blue to amber near twilight and fades into night. These are compact
+lighting approximations, not a full atmospheric scattering or water model.
+Ambient illumination stays at 1.8% and night masks prevent back-facing terrain
+or clouds from receiving direct sunlight.
+
+Dense night-side cloud banks can produce brief blue-white intra-cloud lightning.
+Events have deterministic coarse spatial phases and smooth narrow time envelopes,
+with a period of about nine seconds per phase group. They require sufficiently
+dense current clouds, are masked by the cloud shell, and fade out in daylight.
+They are localized cloud glows, not geometric lightning bolts. City lights are
+not included; the planet remains uninhabited.
 
 Both fields use Cartesian sphere coordinates, with no longitude texture seam
 or pole singularity. All derivative calculations run outside divergent masks.
 Ground and cloud masks are applied after derivative evaluation.
 
-`draw(t)` supplies the same absolute `t` to the camera and weather. Returning to
-A reproduces the **ground and camera**, not the complete weather composite.
-The cloud clock remains continuous at 40, 43, 48 and 52 seconds. On the tested
-Chromium backend the initial/returned ground-only RGBA hash is identical. It
-differs from the previous release because illumination has changed:
+`draw(t)` supplies the same absolute `t` to camera, weather, rotation and flashes.
+Returning to A reproduces the **geography and camera**. Solar illumination now
+advances as requested, so even a ground-only image at 40 seconds differs from
+time zero. The terrain field itself is byte-identical to the original generator.
+
+The verifier also derives a ground-only shader with solar time held at zero to
+compare geography and rendering under identical lighting. Those explicit initial
+and returned RGBA frames match exactly on each tested backend. The Chromium hash
+for this controlled comparison is:
 
 ```text
-52410181989a097e10c9ecaf14c492c1b0d500d2f92f04dc48fc6fedc78a4d1e
+f96e37a5134efedd6ee36d278298e80d390b4f2872e5bb3131e8868906c11844
 ```
+
+The actual-time ground render is separately checked to change with the moving
+sun; it is not falsely reported as an identical full-time endpoint frame.
 
 ## Scale and numerical limits
 
@@ -206,21 +226,21 @@ No graphics assets, libraries or network calls are needed.
 
 | Measurement | Bytes |
 |---|---:|
-| Readable JavaScript, comments included | 6,037 |
-| Raw HTML with readable JavaScript | 6,060 |
-| Minified JavaScript/shaders | 4,761 |
-| Complete executable minified HTML | 4,784 |
-| Binary gzip stream, including header/trailer | 2,273 |
+| Readable JavaScript, comments included | 6,733 |
+| Raw HTML with readable JavaScript | 6,756 |
+| Minified JavaScript/shaders | 5,205 |
+| Complete executable minified HTML | 5,228 |
+| Binary gzip stream, including header/trailer | 2,441 |
 | Length framing | 2 |
-| **Complete transported frame** | **2,275** |
-| **Room remaining under 2,492** | **217** |
+| **Complete transported frame** | **2,443** |
+| **Room remaining under 2,492** | **49** |
 | Minimal generic reconstruction loader | 373 |
 | Normal launcher | 2,257 |
 | Stripped launcher | 287 |
 | Physical integer binary storage | 2,496 |
 | Physical integer hexadecimal text file | 4,995 |
 
-The seed has **19,966 bits**. `artifacts/sizes.json` contains authoritative
+The seed has **19,967 bits**. `artifacts/sizes.json` contains authoritative
 machine-readable values and hashes. Distribution ZIP sizes/hashes are recorded
 separately in `artifacts/delivery.json`; they are not claimed to fit in the seed.
 `frame.bin` and `planet.html.gz` are the actual transported frame and gzip body.
@@ -228,10 +248,10 @@ separately in `artifacts/delivery.json`; they are not claimed to fit in the seed
 The old package used 1,722 gzip bytes expanded into 2,296 base64 bytes, plus a
 165-byte HTML browser unpacker and two-byte frame: **2,463 bytes**. Repacking
 that unchanged old scene as binary-compressed complete HTML measured **1,740**
-framed bytes, freeing 723 bytes. The current weather, latitude winds, fixed-sun lighting, orbital
-transition and Space-only restart add 535 compressed bytes, yielding **2,275**.
-This is 188 bytes smaller than the original delivery, and 225 bytes larger than
-the preceding 2,050-byte cloud/orbit version (commit `90dc33b`). No minimum-size
+framed bytes, freeing 723 bytes. The current weather, latitude winds, rotating sunlight, glint, twilight, storm
+flashes and orbital controls add 703 compressed bytes, yielding **2,443**.
+This is 20 bytes smaller than the original delivery, and 168 bytes larger than
+the preceding 2,275-byte fixed-sun version (commit `ea94634`). No minimum-size
 claim is made.
 
 ## Identity and integration
@@ -294,11 +314,12 @@ Or set `PLAYWRIGHT_MODULE` to an existing module directory and
 Terminal execution where a sandbox blocks browser initialization.
 
 The browser checks load only recovered recipient HTML. They verify exact
-camera/ground-only frame endpoints, changing composites, seeded field purity,
+camera endpoints and ground-only pixels under frozen solar time, changing composites, seeded field purity,
 cloud evolution beyond rigid advection, spatial/time continuity, seam/poles,
 coarse/fine stability, six seeds, eight fixed locations, exact view restoration,
 controls, continuous weather time, smooth generation handoffs, latitude wind signs and
-hemisphere symmetry, day/night brightness under the fixed sun, smooth orbit
+hemisphere symmetry, day/night brightness, measured ocean reflection contribution, changing solar
+direction and intermittent night-side storm emission, smooth orbit
 acceleration, sustained angular speed and fixed globe size. Both normal and stripped recovered documents are
 opened. Diagnostic ground shaders remove only the transported cloud/shadow
 compositing block; diagnostic field shaders reuse actual transported field code.

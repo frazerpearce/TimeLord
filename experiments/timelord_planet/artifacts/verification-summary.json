@@ -1,5 +1,5 @@
 {
-  "frame_bytes": 2275,
+  "frame_bytes": 2443,
   "limit_bytes": 2492,
   "original_timelord_tests_passed": 15,
   "delivery_tests_passed": 4,
@@ -17,7 +17,6 @@
       "network_protection": "HTTP(S) routes aborted"
     }
   ],
-  "exact_ground_endpoint_pixels": true,
   "terrain_generator_unchanged": true,
   "clouds_deterministic_and_evolving": true,
   "orbit_continuous_and_sustained": true,
@@ -31,5 +30,10 @@
   "cloud_generations_smooth": true,
   "cloud_evolution_on_moving_parcels": true,
   "latitude_wind_bands": true,
-  "fixed_sun_day_night": true
+  "exact_ground_endpoint_pixels_with_frozen_solar_time": true,
+  "actual_time_solar_illumination_changes": true,
+  "ocean_glint": true,
+  "twilight_rim": true,
+  "night_side_storm_flashes": true,
+  "solar_drift_radians_per_second": 0.004
 }

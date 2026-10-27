@@ -16,14 +16,16 @@ The browser no longer needs DecompressionStream or a base64 unpacking wrapper.
 
 Leave the mouse and trackpad untouched to watch the film. The camera holds A
 for five seconds, reveals the globe, visits B and returns to exactly the same
-ground view at 40 seconds. Clouds are active throughout, with visible formation/dissipation and latitude-dependent
+ground coordinates and camera view at 40 seconds. Clouds are active throughout, with visible formation/dissipation and latitude-dependent
 trade-wind, westerly and polar flow bands. These are a visual approximation.
-A fixed sun lights the ground and clouds; the orbit reveals a genuine night side.
+A distant fixed sun drifts slowly in the rotating planet frame, moving the
+terminator across fixed geography. Ocean glint, blue/amber twilight and occasional
+night-storm flashes are included. No city lights are added.
 After a three-second returned-A hold, the camera zooms out and smoothly enters
 an ongoing steady orbit. It does not restart the film automatically.
 
 Drag to rotate or scroll to zoom: these pause only the automatic camera, while
-weather keeps moving. Click the image and press **Space** to reset both the film
+weather keeps moving. Click the image and press **Space** to reset the film, sunlight, lightning
 and weather to time zero. Other keys do not reset them.
 
 ```sh
@@ -35,9 +37,9 @@ comments, checks, argument parsing or status output. Extract it, change into
 its directory and run `python3 timelord_planet.py`; it writes `planet.html` there.
 Both variants use the installed Python interpreter; neither bundles Python.
 
-The complete transported frame is **2,275 bytes**: a 2,273-byte gzip stream plus
-two-byte length. It recovers **4,784 bytes of executable HTML**. The physical
-integer is **19,966 bits / 2,496 binary bytes**, or **4,995 bytes** as hexadecimal
+The complete transported frame is **2,443 bytes**: a 2,441-byte gzip stream plus
+two-byte length. It recovers **5,228 bytes of executable HTML**. The physical
+integer is **19,967 bits / 2,496 binary bytes**, or **4,995 bytes** as hexadecimal
 text. Distribution ZIP sizes are separate measurements in `delivery.json`.
 
 `seed_planet.txt` is the large **TimeLord transport seed**, reconstructing the

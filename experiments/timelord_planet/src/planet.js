@@ -52,6 +52,11 @@ float cloud(vec3 p){
  }
  return h;
 }
+// A fixed inertial sun appears to drift west in the rotating planet's local frame.
+vec3 sunDirection(float t){
+ float a=-t*.004,x=cos(a),y=sin(a);
+ return normalize(vec3(x+.3*y,-.1,.3*x-y));
+}
 void main(){
  vec2 q=(2.*gl_FragCoord.xy-R)/R.y*V.z;
  float r=dot(q,q);
@@ -68,20 +73,26 @@ void main(){
   // Differential bump shading only; the ray intersection remains spherical.
   vec3 point=vec3(q,sqrt(max(0.,1.-r)))*(1.+max(h,0.)*.25);
   vec3 normal=normalize(cross(dFdx(point),dFdy(point)));
-  // Fixed planet-local sun: camera motion must not carry the light with it.
-  vec3 sun=normalize(vec3(1.,-.1,.3));
-  float day=smoothstep(-.02,.04,dot(n,sun));
+  // The ground coordinates stay fixed while solar illumination advances.
+  vec3 sun=sunDirection(V.w);
+  float solar=dot(n,sun),day=smoothstep(-.02,.04,solar);
   float light=.018+.982*max(0.,dot(rotation*normal,sun))*day;
   col*=light;
-  col+=vec3(.2,.35,.5)*pow(r,8.)*.22*day;
+  // Smooth water reflection, and an analytic blue-to-amber twilight rim.
+  col+=vec3(1.,.8,.5)*pow(max(0.,dot(reflect(-sun,rotation*normal),rotation*vec3(0,0,1))),96.)*(1.-smoothstep(-.004,.004,h))*day*.8;
+  col+=mix(vec3(.65,.14,.025),vec3(.2,.35,.5),smoothstep(0.,.25,solar))*pow(r,8.)*.35*smoothstep(-.12,.12,solar);
  col=r<1.?col:vec3(.008,.015,.027);
  // Orthographic intersection with a separate shell at radius 1.012.
  vec3 shell=vec3(q,sqrt(max(0.,1.024144-r)));
- float d=cloud(rotation*shell/1.012);
+ vec3 cp=rotation*shell/1.012;
+ float d=cloud(cp);
+ float cover=.5*smoothstep(.5,.72,d)*(1.-smoothstep(1.02,1.024144,r));
  col*=1.-.23*smoothstep(.5,.72,cloud(normalize(n+sun*.012)))*step(r,1.);
  vec3 top=shell*(1.+d*.04);
  vec3 cn=normalize(cross(dFdx(top),dFdy(top)));
- col=mix(col,vec3(.91,.95,1.)*(.018+.982*max(0.,dot(rotation*cn,sun))*smoothstep(-.02,.04,dot(rotation*normalize(shell),sun))),.5*smoothstep(.5,.72,d)*(1.-smoothstep(1.02,1.024144,r)));
+ col=mix(col,vec3(.91,.95,1.)*(.018+.982*max(0.,dot(rotation*cn,sun))*smoothstep(-.02,.04,dot(rotation*normalize(shell),sun))),cover);
+ // Brief, deterministically phased flashes inside dense night-side storm clouds.
+ col+=vec3(.3,.4,.7)*pow(max(0.,sin(V.w*.7+floor(N(cp*6.)*8.))),128.)*smoothstep(.66,.78,d)*cover*(1.-day);
  gl_FragColor=vec4(pow(col,vec3(.85)),1);
 }`.replace('precision highp float;','#extension GL_OES_standard_derivatives : enable\nprecision highp float;'));
 g.linkProgram(p);g.useProgram(p);

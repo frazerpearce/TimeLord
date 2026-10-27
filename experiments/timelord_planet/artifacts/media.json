@@ -1,10 +1,9 @@
 {
   "world_seed": 1,
-  "html_sha256": "294ede8c23bc23543cf348bf6bf503ca77ad5abdc4f3a9fe36c5cc47f473e62b",
+  "html_sha256": "555847eb19d41c225f8995ffa1ef065c9eed8f97f21c49e8741a665bd45afa1d",
   "clips": {
     "loop": {
       "programs": [],
-      "stream_groups": [],
       "streams": [
         {
           "width": 960,
@@ -15,14 +14,13 @@
       ],
       "format": {
         "duration": "130.000000",
-        "size": "18105395"
+        "size": "18454711"
       },
-      "sha256": "fa71be30357d86159eb7e08a0a44a16ff9d025eeb50fc034fb309e838bbe5834",
-      "description": "Original film followed by one sustained orbit, including dusk, full night and dawn."
+      "sha256": "cc6fc28670f675f352d3ef2a4b013831e3a009a18efbd784d5293031a09fd73e",
+      "description": "Original film followed by one sustained orbit, including dusk, full night and dawn. Includes slow solar drift, ocean glint, twilight and deterministic storm flashes."
     },
     "weather": {
       "programs": [],
-      "stream_groups": [],
       "streams": [
         {
           "width": 960,
@@ -33,10 +31,10 @@
       ],
       "format": {
         "duration": "24.000000",
-        "size": "1241650"
+        "size": "1257270"
       },
-      "sha256": "9a676fff2d5fcf8aae739adad5ec32e141381bdd014b8e590122b01be37d04f4",
-      "description": "Camera fixed at [1.28,-.095,1.2], seed 1; absolute weather time 0..24 s."
+      "sha256": "0dde1fbb60cb0f26147b45eb87524d5caa17abb7f2350dd1ae6270191f215003",
+      "description": "Camera fixed at [1.28,-.095,1.2], seed 1; absolute weather time 0..24 s. Includes slow solar drift, ocean glint, twilight and deterministic storm flashes."
     }
   }
 }

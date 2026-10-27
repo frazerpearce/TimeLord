@@ -16,7 +16,7 @@
   "offline": true,
   "network_protection": "HTTP(S) routes aborted",
   "requests": [
-    "file:///var/folders/6h/fzswqsb11d91__njdsgwv2f80000gn/T/magrathea-clean-08s73i3m/normal/planet.html"
+    "file:///var/folders/6h/fzswqsb11d91__njdsgwv2f80000gn/T/magrathea-clean-an_l_1so/normal/planet.html"
   ],
   "errors": [],
   "initial": {
@@ -34,8 +34,8 @@
       0.3,
       0.025
     ],
-    "hash": "937b91e651bc56ba4dd27fc697ff0f5936010da572fa82f41592b601b27d2555",
-    "mean_luminance": 40.104592737216784
+    "hash": "6dd5531935c67ea6eb37e9ca56b27d5dc343a1fd7594b86caf0413318a8955bd",
+    "mean_luminance": 46.20439316863563
   },
   "groundInitial": {
     "view": [
@@ -43,8 +43,8 @@
       0.3,
       0.025
     ],
-    "hash": "673ec82521394aed16ec4e92ee25c98522243185f6eb525580fc75839f8e9691",
-    "mean_luminance": 40.10393551683918
+    "hash": "5ea0ab0518da730a04384c893c54d0b52e4825449c38707b6cf3693ff5fb9127",
+    "mean_luminance": 40.103938308505846
   },
   "groundReturn": {
     "view": [
@@ -52,10 +52,19 @@
       0.3,
       0.025
     ],
-    "hash": "673ec82521394aed16ec4e92ee25c98522243185f6eb525580fc75839f8e9691",
-    "mean_luminance": 40.10393551683918
+    "hash": "5ea0ab0518da730a04384c893c54d0b52e4825449c38707b6cf3693ff5fb9127",
+    "mean_luminance": 40.103938308505846
   },
-  "ground_endpoint_frame_equal": true,
+  "solarReturn": {
+    "view": [
+      0.4,
+      0.3,
+      0.025
+    ],
+    "hash": "18cd347043b6c660f8cf10fbb53500413639b62f4e208fd1797714b188e27803",
+    "mean_luminance": 46.20376555047149
+  },
+  "ground_endpoint_frame_equal_with_frozen_sun": true,
   "composite_endpoint_frame_equal": false,
   "captures": {
     "A": {
@@ -75,8 +84,8 @@
         0.3,
         1.2
       ],
-      "hash": "6ae2b3bfaa7a9efbf9bf56cbcf72daf700f265f177dbf411a1cf8a2d3453df59",
-      "mean_luminance": 51.393473144330834
+      "hash": "37815fc748137023b297cf2ddb496a5cfe07a0600b26180929a7bb08ba5ac507",
+      "mean_luminance": 53.59561180260665
     },
     "B": {
       "time": 20,
@@ -85,8 +94,8 @@
         -0.45,
         0.025
       ],
-      "hash": "4dfe1986bc0111c6f8f9e2b58b5695b83cd002f144d01685f63454325cb3f6eb",
-      "mean_luminance": 43.279276158514286
+      "hash": "5a24ead5d7c74d075051ef5701de665ae716276b30d1b5c6263d6de3cdcbc668",
+      "mean_luminance": 39.882878240197925
     },
     "A-return": {
       "time": 40,
@@ -95,8 +104,8 @@
         0.3,
         0.025
       ],
-      "hash": "937b91e651bc56ba4dd27fc697ff0f5936010da572fa82f41592b601b27d2555",
-      "mean_luminance": 40.104592737216784
+      "hash": "6dd5531935c67ea6eb37e9ca56b27d5dc343a1fd7594b86caf0413318a8955bd",
+      "mean_luminance": 46.20439316863563
     },
     "orbit-start": {
       "time": 48,
@@ -105,8 +114,8 @@
         0.3,
         1.2000000000000002
       ],
-      "hash": "d8fc5c91bd9d840d6e5a2e34cf7f3668dd686f2b58260bff55b222dd2af71c7f",
-      "mean_luminance": 50.32842178380719
+      "hash": "b55eeb4ee4d21e3146b8a988f171aac363ae33b3cf13582ab21a9dc061344d96",
+      "mean_luminance": 57.9574227763102
     },
     "orbit": {
       "time": 60,
@@ -115,8 +124,8 @@
         0.3,
         1.2000000000000002
       ],
-      "hash": "45ae2e6e0c8134b289fbc2c5de13c4453f7b72b7ce7c93f4ce17da6d4ee0ed88",
-      "mean_luminance": 69.12241230549864
+      "hash": "38c51a8887a45c19b480cddbb3c067d7976a1e454d8eef482b217adf37bad5e1",
+      "mean_luminance": 69.31015846155769
     },
     "orbit-later": {
       "time": 75,
@@ -125,8 +134,8 @@
         0.3,
         1.2000000000000002
       ],
-      "hash": "a2763d8df4533ce7ef38f7003c6b675252cc73d22d9f1f78c3b879b75667ec0f",
-      "mean_luminance": 38.16492676945873
+      "hash": "6331ac5fe5489dae0c0df9e8775f4f057130928cfa8563521d14ec35f94f7a18",
+      "mean_luminance": 27.356998391914356
     },
     "terminator": {
       "time": 80,
@@ -135,8 +144,8 @@
         0.3,
         1.2000000000000002
       ],
-      "hash": "e8c5304bd46e8fa9cb0e040a7be99fba506044f66bd3cf8241a8f3b433c171ef",
-      "mean_luminance": 21.02584446176145
+      "hash": "031a44fcc2185dd3947343f5224f0a626176124a4153a427c87b1c0831539107",
+      "mean_luminance": 13.53817722921778
     },
     "night": {
       "time": 100,
@@ -145,8 +154,8 @@
         0.3,
         1.2000000000000002
       ],
-      "hash": "f0202788d585871f6cfc7e025d22ff4e52d4f1120e092d62348bd8db4b0ec999",
-      "mean_luminance": 3.638142637044415
+      "hash": "9c87ffb58c127bc9b969c04c92cc8576f97a54ee18da012f808021d6cbd4b412",
+      "mean_luminance": 3.6484119728092756
     },
     "dawn": {
       "time": 120,
@@ -155,8 +164,8 @@
         0.3,
         1.2000000000000002
       ],
-      "hash": "518d940c88aadf42b835b01b86922d70e94c810bffae2dbef4ffc1bbff699402",
-      "mean_luminance": 21.2667744186635
+      "hash": "5871d3a0ede12c853f1a8b017c196508f348a80fd6fd73e63f38e0d6d860f589",
+      "mean_luminance": 39.475850910688436
     }
   },
   "choreography": {
@@ -371,6 +380,32 @@
     ]
   },
   "field": {
+    "suns": [
+      {
+        "time": 0,
+        "vector": [
+          0.9534599832150759,
+          -0.09535362783245593,
+          0.2860303654535745
+        ]
+      },
+      {
+        "time": 40,
+        "vector": [
+          0.8957198443579766,
+          -0.09535362783245593,
+          0.43428702220187687
+        ]
+      },
+      {
+        "time": 400,
+        "vector": [
+          -0.3137712672617685,
+          -0.09535362783245593,
+          0.9447013046463721
+        ]
+      }
+    ],
     "coords": [
       [
         0.4,
@@ -993,27 +1028,27 @@
   "seedRenders": [
     {
       "seed": 0,
-      "hash": "9df32e0dc7532157d03705469ca4d9add4882d7e1929a20b17e9c2afe5d8ed9d"
+      "hash": "ef39fb040becf30533599188296e0308c76daa73b2aa708280a3035d82eaca64"
     },
     {
       "seed": 1,
-      "hash": "1a5411785b685d9e724058fdaa81dcab7d668a8076e7c941c6a6970ba26be708"
+      "hash": "472f1ecfcc1659f920c2f76b01efff43afb369f73f38459d6f29efa5cc471d3f"
     },
     {
       "seed": 2,
-      "hash": "28eeaa24bf49dd6cd632c51af93b5c1c5e060d118662ef490af42514f94ec70b"
+      "hash": "2411fa1724434d2ee24b3f77cc00bd84040f936f0381b389180a1a77db6e487d"
     },
     {
       "seed": 42,
-      "hash": "b54b2289f65915a5314cc93a95a68cb65943f353835bcea0149acd1709acc022"
+      "hash": "b2103f517b8717e888ec4eb05fc709e7fb3cf78ea95d49d16419ec230a93892d"
     },
     {
       "seed": 65536,
-      "hash": "728ef8efb4c0f101fa913b2068b2fa6fdc74ed2efb3b252e1f1456d80728a4c0"
+      "hash": "4aad4ccb5683d83bdaeb3fb1bfb8d4ee0cc609d4f238904e8ffa7d4c0eb24369"
     },
     {
       "seed": 4294967295,
-      "hash": "d5f15e2f003a78f88cefbbc969066dac14f858600eff2a1f5eef1e866a27118f"
+      "hash": "ff6c91b884118d76eb2f11a1f507bec2b84ac14c8f5b538f7f43db75403721c9"
     }
   ],
   "locations": [
@@ -1027,8 +1062,8 @@
         0.3,
         0.025
       ],
-      "hash": "2f719d40a3ca76b37d9be0e0a285ddb310f2e49af8388bf23d95b9395bcc3a62",
-      "mean_luminance": 94.53883796151803
+      "hash": "1a4af21e70927f37f978facbe363b65ca6ff9df162310e61df15d537e25dc12f",
+      "mean_luminance": 100.42267079322554
     },
     {
       "coordinate": [
@@ -1040,8 +1075,8 @@
         -0.45,
         0.025
       ],
-      "hash": "9f31d96f86ba9b2a49c651878b6d36497c763172a348e59f1f463f25893ab18c",
-      "mean_luminance": 42.27804279035152
+      "hash": "906f5957ab4adc6b9261caeec73bb3cfc69c71c7f8869499a5a33225f150005b",
+      "mean_luminance": 39.47820030205651
     },
     {
       "coordinate": [
@@ -1053,8 +1088,8 @@
         0.6,
         0.025
       ],
-      "hash": "810d31ee38902982c3ca24569aabd265c31aa0aa292e577c29435a1bfe0e15da",
-      "mean_luminance": 6.905172234046895
+      "hash": "3e34ad60adaea0b0ce8abc3fdb5237b5105ee704bf5dee6ed9818d95c22a8881",
+      "mean_luminance": 6.903852716143172
     },
     {
       "coordinate": [
@@ -1066,8 +1101,8 @@
         0,
         0.025
       ],
-      "hash": "dd68f68daac47eec2aa87ada4861927d7f6c471c1a613bb43d3baea5acd981ba",
-      "mean_luminance": 27.62746784529217
+      "hash": "038fffb2f8c8072a907bb0f96cc1013860ace8500b39a974cccbcdeadce385e9",
+      "mean_luminance": 31.282916648036213
     },
     {
       "coordinate": [
@@ -1079,8 +1114,8 @@
         -1,
         0.025
       ],
-      "hash": "03b2b240783c40b73a17e66dfdf58529da462f89381d0a5a61655823e571d8db",
-      "mean_luminance": 2.6011308346672473
+      "hash": "69dbd73be08a049851f1f1666bad13ce887fd19c177159f8bd5c7e7f58cdb15b",
+      "mean_luminance": 1.693568150733057
     },
     {
       "coordinate": [
@@ -1092,8 +1127,8 @@
         1.3,
         0.025
       ],
-      "hash": "5e9cd9118eae085d7719a78970a9f102f97cfd2fa7ea1a10a4e4e843d372d878",
-      "mean_luminance": 62.40993587579535
+      "hash": "f8fb2711f93ab07fd003b5440424a571d1b169de88c19831dedd1794321d1d83",
+      "mean_luminance": 64.22564842167424
     },
     {
       "coordinate": [
@@ -1105,8 +1140,8 @@
         1.5707963267948966,
         0.025
       ],
-      "hash": "11bbec94fa40507d7f34f81605ad10d4fe4adb928cb87b5fc421d2f45b4154b7",
-      "mean_luminance": 2.845918843721738
+      "hash": "699b293ae79b981dd622ac8d19846680623474e91d283845bb014fe54c10a25e",
+      "mean_luminance": 2.8463029810915144
     },
     {
       "coordinate": [
@@ -1118,53 +1153,133 @@
         -1.5707963267948966,
         0.025
       ],
-      "hash": "bb8dd8304e5a970ba5fde709fbad2442015b2c14a8678db40cdec56bb6243e0a",
-      "mean_luminance": 27.530405068665374
+      "hash": "73f6d2d8b923cf8a4b34ecad13984e46f48bfbb5cdaa92d7c1d8993b61e31dc8",
+      "mean_luminance": 28.08585630792504
     }
   ],
   "lighting": {
     "sun_direction": [
-      1,
-      -0.1,
-      0.3
+      0.9534599832150759,
+      -0.09535362783245593,
+      0.2860303654535745
     ],
     "dayGround": {
       "view": [
-        1.2793395323170296,
-        -0.09549131716035351,
+        1.2793468735446294,
+        -0.09549912097253083,
         1.2
       ],
-      "hash": "8fba9cf1414077c3d18e8889b528a796e3cb814796e006687b8944035c67bd30",
-      "mean_luminance": 61.07981522878185
+      "hash": "802b362bf8148e2e73d8b03814a13bcd2f504d332c5873a16d544e8e5ca71ca5",
+      "mean_luminance": 62.35481559018522
     },
     "dayClouds": {
       "view": [
-        1.2793395323170296,
-        -0.09549131716035351,
+        1.2793468735446294,
+        -0.09549912097253083,
         1.2
       ],
-      "hash": "425df2a81ba8e853630c4fc644db7a8d2898860950b7eac16148f53ed946a443",
-      "mean_luminance": 72.17357129752484
+      "hash": "9b660c4a1afdb39f68f5419b28358cb9fe25ecd5d857196d5e7f40739b8b7fe0",
+      "mean_luminance": 73.34111193191762
     },
     "nightGround": {
       "view": [
-        4.420932185906823,
-        0.09549131716035351,
+        4.420939527134422,
+        0.09549912097253083,
         1.2
       ],
-      "hash": "f1f301a7e730e42dbe613cc598b35c0eaf5ba3544e8945ce13f713acf75dad37",
-      "mean_luminance": 3.1168343910244674
+      "hash": "257641de0b2565453c28c78e1609226277f32b0f45f4e5f5ab1367af58a9ab99",
+      "mean_luminance": 3.116847792881232
     },
     "nightClouds": {
       "view": [
-        4.420932185906823,
-        0.09549131716035351,
+        4.420939527134422,
+        0.09549912097253083,
         1.2
       ],
-      "hash": "96ffe6eacb9fc1a8b119d272efa994b5a517387ff38c5dfac3d985743b3a9ece",
-      "mean_luminance": 3.473874298185694
+      "hash": "2ba1cce98f3d176f9825a82d6faadf245524ff426dca231d3cdbc07b94b1ef7b",
+      "mean_luminance": 3.4738933344367955
     }
   },
+  "glints": [
+    {
+      "longitude": -1,
+      "added_luminance": 0.05381389146773241
+    },
+    {
+      "longitude": 0,
+      "added_luminance": 0.27305398872643494
+    },
+    {
+      "longitude": 1,
+      "added_luminance": 1.0113164014149234
+    },
+    {
+      "longitude": 2,
+      "added_luminance": 0.018790466401419792
+    },
+    {
+      "longitude": 3,
+      "added_luminance": 0.9175657150776892
+    },
+    {
+      "longitude": 4,
+      "added_luminance": 0
+    }
+  ],
+  "flashes": [
+    {
+      "time": 80,
+      "added_luminance": 0.15892737511043942
+    },
+    {
+      "time": 84.3,
+      "added_luminance": 0.000007904509283562788
+    },
+    {
+      "time": 86,
+      "added_luminance": 0.004916732979676208
+    },
+    {
+      "time": 90,
+      "added_luminance": 0
+    },
+    {
+      "time": 93.3,
+      "added_luminance": 0.0000023717948711698966
+    },
+    {
+      "time": 95,
+      "added_luminance": 0.02095626105212789
+    },
+    {
+      "time": 99.3,
+      "added_luminance": 0.0023691987179237373
+    },
+    {
+      "time": 102,
+      "added_luminance": 0
+    },
+    {
+      "time": 104.3,
+      "added_luminance": 0.33484478227104875
+    },
+    {
+      "time": 108,
+      "added_luminance": 0
+    },
+    {
+      "time": 111.3,
+      "added_luminance": 0.00009729995579643713
+    },
+    {
+      "time": 115,
+      "added_luminance": 0.008337782935456062
+    },
+    {
+      "time": 120,
+      "added_luminance": 0
+    }
+  ],
   "controls": {
     "wheel": [
       0.4,
@@ -1230,20 +1345,20 @@
   "timing": {
     "frames": 30,
     "synchronous_readback": true,
-    "median_render_ms": 2,
+    "median_render_ms": 4,
     "max_render_ms": 9
   },
   "animation": {
     "actual_application_callback_ran": true,
     "frames": 61,
-    "elapsed_ms": 1006
+    "elapsed_ms": 1005
   },
   "distributionSmoke": [
     {
       "distribution": "stripped",
       "hash": "7e8101c7b5b8e49598a0bc5456e50acc21c1f87580f662954882adaad18ede03",
       "requests": [
-        "file:///var/folders/6h/fzswqsb11d91__njdsgwv2f80000gn/T/magrathea-clean-08s73i3m/stripped/planet.html"
+        "file:///var/folders/6h/fzswqsb11d91__njdsgwv2f80000gn/T/magrathea-clean-an_l_1so/stripped/planet.html"
       ],
       "errors": []
     }
