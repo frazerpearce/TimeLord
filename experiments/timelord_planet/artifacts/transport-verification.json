@@ -3,14 +3,14 @@
   "reproducible_build": true,
   "address_vectors_pass": true,
   "unchanged_terrain_generator": true,
-  "total_framed_bytes": 2443,
+  "total_framed_bytes": 2471,
   "limit_pass": true,
   "clean_isolated_loaders": [
     "minimal",
     "normal",
     "stripped"
   ],
-  "html_sha256": "555847eb19d41c225f8995ffa1ef065c9eed8f97f21c49e8741a665bd45afa1d",
-  "packed_sha256": "9f63bb8ef1b9f437f0be849b614d65daa5ea1498d89a5f18f4423e9b07bdb9a5",
+  "html_sha256": "1ab6ca5b1459306507b26eb47571eb5b4e5774c27d7ce69019574ce28c8df8ec",
+  "packed_sha256": "e244edfaabb58494df0a1c6fbd4100fc4b99c8c65e840f71bc7757bb717521f4",
   "seed_bits": 19967
 }

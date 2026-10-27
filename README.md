@@ -350,7 +350,8 @@ Latitude-dependent winds produce qualitative trade-wind, westerly and polar
 bands, without accumulating indefinite shear. A distant fixed sun drifts slowly
 in the rotating planet frame, moving the terminator across the terrain. Ocean
 glint and warm twilight colour follow the sunlight; dense night-side clouds
-occasionally flash with localized lightning. The planet remains uninhabited.
+occasionally flash with localized lightning, each storm cell using an independent
+seeded rate and phase. The planet remains uninhabited.
 After a three-second return hold, the camera reveals the globe and
 smoothly enters a continuing steady orbit; it does not restart automatically.
 
@@ -370,9 +371,9 @@ Use a matching seed and launcher: the older loader expected direct HTML.
 Existing download paths remain supported; version 1 is preserved at commit
 `31914fa`.
 
-The complete framed payload is **2,443 bytes**, including its two-byte length
-and gzip header/trailer—49 bytes below the 2,492-byte limit. It expands to
-**5,228 HTML bytes**. The physical transport integer is **19,967 bits / 2,496 binary bytes**, or 4,995 bytes
+The complete framed payload is **2,471 bytes**, including its two-byte length
+and gzip header/trailer—21 bytes below the 2,492-byte limit. It expands to
+**5,285 HTML bytes**. The physical transport integer is **19,967 bits / 2,496 binary bytes**, or 4,995 bytes
 as hexadecimal text. The generated world's unsigned 32-bit identity is `1`,
 which is distinct from the large TimeLord transport seed.
 

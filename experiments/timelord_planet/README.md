@@ -3,7 +3,7 @@
 *Custom-made luxury planet building.*
 
 **Works, fits, and was actually run offline from its reconstructed TimeLord
-integer seed.** The new complete frame is **2,443 bytes**, 49 below the
+integer seed.** The new complete frame is **2,471 bytes**, 21 below the
 2,492-byte information limit. The ground is unchanged. Clouds move and evolve
 through the original 40-second film, then the camera enters a sustained orbit.
 
@@ -138,8 +138,9 @@ Ambient illumination stays at 1.8% and night masks prevent back-facing terrain
 or clouds from receiving direct sunlight.
 
 Dense night-side cloud banks can produce brief blue-white intra-cloud lightning.
-Events have deterministic coarse spatial phases and smooth narrow time envelopes,
-with a period of about nine seconds per phase group. They require sufficiently
+Each local Cartesian storm cell has its own seeded flash frequency and phase,
+with smooth narrow envelopes. Periods range from about 4.2 to 12.6 seconds;
+there are no shared global timing groups. They require sufficiently
 dense current clouds, are masked by the cloud shell, and fade out in daylight.
 They are localized cloud glows, not geometric lightning bolts. City lights are
 not included; the planet remains uninhabited.
@@ -226,14 +227,14 @@ No graphics assets, libraries or network calls are needed.
 
 | Measurement | Bytes |
 |---|---:|
-| Readable JavaScript, comments included | 6,733 |
-| Raw HTML with readable JavaScript | 6,756 |
-| Minified JavaScript/shaders | 5,205 |
-| Complete executable minified HTML | 5,228 |
-| Binary gzip stream, including header/trailer | 2,441 |
+| Readable JavaScript, comments included | 6,855 |
+| Raw HTML with readable JavaScript | 6,878 |
+| Minified JavaScript/shaders | 5,262 |
+| Complete executable minified HTML | 5,285 |
+| Binary gzip stream, including header/trailer | 2,469 |
 | Length framing | 2 |
-| **Complete transported frame** | **2,443** |
-| **Room remaining under 2,492** | **49** |
+| **Complete transported frame** | **2,471** |
+| **Room remaining under 2,492** | **21** |
 | Minimal generic reconstruction loader | 373 |
 | Normal launcher | 2,257 |
 | Stripped launcher | 287 |
@@ -249,8 +250,8 @@ The old package used 1,722 gzip bytes expanded into 2,296 base64 bytes, plus a
 165-byte HTML browser unpacker and two-byte frame: **2,463 bytes**. Repacking
 that unchanged old scene as binary-compressed complete HTML measured **1,740**
 framed bytes, freeing 723 bytes. The current weather, latitude winds, rotating sunlight, glint, twilight, storm
-flashes and orbital controls add 703 compressed bytes, yielding **2,443**.
-This is 20 bytes smaller than the original delivery, and 168 bytes larger than
+flashes and orbital controls add 731 compressed bytes, yielding **2,471**.
+This is 8 bytes larger than the original delivery, and 196 bytes larger than
 the preceding 2,275-byte fixed-sun version (commit `ea94634`). No minimum-size
 claim is made.
 
@@ -319,7 +320,8 @@ cloud evolution beyond rigid advection, spatial/time continuity, seam/poles,
 coarse/fine stability, six seeds, eight fixed locations, exact view restoration,
 controls, continuous weather time, smooth generation handoffs, latitude wind signs and
 hemisphere symmetry, day/night brightness, measured ocean reflection contribution, changing solar
-direction and intermittent night-side storm emission, smooth orbit
+direction, independent storm-cell peak times and simultaneously flashing/dark cells,
+intermittent night-side storm emission, smooth orbit
 acceleration, sustained angular speed and fixed globe size. Both normal and stripped recovered documents are
 opened. Diagnostic ground shaders remove only the transported cloud/shadow
 compositing block; diagnostic field shaders reuse actual transported field code.

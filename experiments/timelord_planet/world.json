@@ -1,5 +1,5 @@
 {
-  "generator": "magrathea_v4",
+  "generator": "magrathea_v5",
   "world_seed": 1,
   "world_seed_convention": "unsigned 32-bit integer",
   "initial_view": {
@@ -8,8 +8,8 @@
     "z": 0.025
   },
   "transport_seed_file": "seed_planet.txt",
-  "transport_framed_bytes": 2443,
-  "payload_sha256": "9f63bb8ef1b9f437f0be849b614d65daa5ea1498d89a5f18f4423e9b07bdb9a5",
+  "transport_framed_bytes": 2471,
+  "payload_sha256": "e244edfaabb58494df0a1c6fbd4100fc4b99c8c65e840f71bc7757bb717521f4",
   "note": "Delivery metadata only. The identical world and camera constants are already in the transported program; this file supplies no runtime code or data.",
   "film_seconds": 40,
   "returned_hold_seconds": 3,
@@ -17,11 +17,11 @@
   "steady_orbit_start_seconds": 52,
   "orbit_speed_radians_per_second": 0.08,
   "transport": "uint16_le length + gzip-compressed complete HTML",
-  "html_sha256": "555847eb19d41c225f8995ffa1ef065c9eed8f97f21c49e8741a665bd45afa1d",
+  "html_sha256": "1ab6ca5b1459306507b26eb47571eb5b4e5774c27d7ce69019574ce28c8df8ec",
   "weather_time": "Continuous elapsed seconds; Space explicitly resets to zero.",
   "sun_direction": "At time zero normalize([1,-.1,.3]); rotate west by .004*t radians in body-local coordinates.",
   "wind": "physical zonal angular velocity .018*(-1+6*sin(latitude)^2-6*sin(latitude)^4) rad/s",
   "weather": "12-second asynchronous generations, overlapping ages bounded to 24 seconds",
   "rotation_radians_per_second": 0.004,
-  "night_lights": "Localized deterministic intra-cloud flashes; no city lights."
+  "night_lights": "Each local storm cell has independent seeded flash frequency and phase, masked to dense night-side clouds; no city lights."
 }

@@ -1,5 +1,5 @@
 {
-  "frame_bytes": 2443,
+  "frame_bytes": 2471,
   "limit_bytes": 2492,
   "original_timelord_tests_passed": 15,
   "delivery_tests_passed": 4,
@@ -35,5 +35,7 @@
   "ocean_glint": true,
   "twilight_rim": true,
   "night_side_storm_flashes": true,
-  "solar_drift_radians_per_second": 0.004
+  "solar_drift_radians_per_second": 0.004,
+  "storm_cells_have_independent_flash_clocks": true,
+  "simultaneously_flashing_and_dark_cells_verified": true
 }

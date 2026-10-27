@@ -37,8 +37,8 @@ comments, checks, argument parsing or status output. Extract it, change into
 its directory and run `python3 timelord_planet.py`; it writes `planet.html` there.
 Both variants use the installed Python interpreter; neither bundles Python.
 
-The complete transported frame is **2,443 bytes**: a 2,441-byte gzip stream plus
-two-byte length. It recovers **5,228 bytes of executable HTML**. The physical
+The complete transported frame is **2,471 bytes**: a 2,469-byte gzip stream plus
+two-byte length. It recovers **5,285 bytes of executable HTML**. The physical
 integer is **19,967 bits / 2,496 binary bytes**, or **4,995 bytes** as hexadecimal
 text. Distribution ZIP sizes are separate measurements in `delivery.json`.
 

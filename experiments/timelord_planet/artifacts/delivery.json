@@ -1,22 +1,22 @@
 {
   "archive": "magrathea.zip",
   "compatibility_archive": "timelord-planet.zip",
-  "archive_bytes": 6908,
-  "archive_sha256": "a42733adb7ed842c94118fbf6bcf43c86aae33a849ed02693fae5f72a3b821b8",
+  "archive_bytes": 6950,
+  "archive_sha256": "582b21a51d130bd33e271dadbc3faff8380e74c1728dc324bb023e1a4cd90387",
   "stripped": {
     "archive": "magrathea-stripped.zip",
-    "archive_bytes": 3286,
+    "archive_bytes": 3293,
     "launcher_bytes": 287,
-    "archive_sha256": "21294052f92a15826972da4e21370811db6d96d0a18b66b990d4d63887858f6f",
+    "archive_sha256": "5b10a23592011d6b4806cb2c20023077fbdc05a679bac465d959f4819620e573",
     "files": {
       "timelord_planet.py": "fabc0c45760a2a114003975406c0bd8e22e55687bee1b5c9757335f5a8a7d9c5",
-      "seed_planet.txt": "1318833d2fc6c85581310f396e255a22dd8ea24c0fcb4bb25d7f6e15c5148e78"
+      "seed_planet.txt": "782ab30609a7905618eebd5a7cff016201e1c5f8c7f3bc24e5b5045bc79464a2"
     }
   },
   "files": {
     "timelord_planet.py": "2f57500aafdc50dc27a72d2a68afa4ca643636c6332698b4ff5626b091b02052",
-    "seed_planet.txt": "1318833d2fc6c85581310f396e255a22dd8ea24c0fcb4bb25d7f6e15c5148e78",
-    "README.md": "502480b26cde13d918218e08d6e0befcca0bf32b2e4aa87f23a94cdfb9d519d2",
-    "world.json": "e924aca8e02b9626ec56ae7402822fc969544599cb1aa568e7a2d30a71b60e9c"
+    "seed_planet.txt": "782ab30609a7905618eebd5a7cff016201e1c5f8c7f3bc24e5b5045bc79464a2",
+    "README.md": "2e3b486aedf48aadcd4db0bc0126e1b64d4af180f2254f680778bb4107146f16",
+    "world.json": "11b3544331fa8c725b10af20085e4009372c8bd42cf08e4ea3cdbc30e75e6d5c"
   }
 }

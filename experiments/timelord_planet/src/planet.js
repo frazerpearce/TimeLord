@@ -57,6 +57,11 @@ vec3 sunDirection(float t){
  float a=-t*.004,x=cos(a),y=sin(a);
  return normalize(vec3(x+.3*y,-.1,.3*x-y));
 }
+// Independent local storm clocks avoid synchronized global flash groups.
+float flash(vec3 p){
+ vec3 s=floor(p*8.);
+ return pow(max(0.,sin(V.w*(.5+H(s))+H(s+9.)*99.)),128.);
+}
 void main(){
  vec2 q=(2.*gl_FragCoord.xy-R)/R.y*V.z;
  float r=dot(q,q);
@@ -91,8 +96,8 @@ void main(){
  vec3 top=shell*(1.+d*.04);
  vec3 cn=normalize(cross(dFdx(top),dFdy(top)));
  col=mix(col,vec3(.91,.95,1.)*(.018+.982*max(0.,dot(rotation*cn,sun))*smoothstep(-.02,.04,dot(rotation*normalize(shell),sun))),cover);
- // Brief, deterministically phased flashes inside dense night-side storm clouds.
- col+=vec3(.3,.4,.7)*pow(max(0.,sin(V.w*.7+floor(N(cp*6.)*8.))),128.)*smoothstep(.66,.78,d)*cover*(1.-day);
+ // Each local storm cell has its own seeded flash rate and phase.
+ col+=vec3(.3,.4,.7)*flash(cp)*smoothstep(.66,.78,d)*cover*(1.-day);
  gl_FragColor=vec4(pow(col,vec3(.85)),1);
 }`.replace('precision highp float;','#extension GL_OES_standard_derivatives : enable\nprecision highp float;'));
 g.linkProgram(p);g.useProgram(p);

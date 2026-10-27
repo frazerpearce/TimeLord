@@ -87,14 +87,15 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
                 obs.compile(prefix+`uniform vec3 P;void main(){float v=floor((wind(P.y)*16.+.5)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
                 obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(N(P*3.+91.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
                 obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(clamp(cloud(advect(P,-V.w)),0.,1.)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`),
-                ...['x','y','z'].map(axis=>obs.compile(prefix+`uniform vec3 P;void main(){float v=floor((sunDirection(V.w).${axis}*.5+.5)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`))];
+                ...['x','y','z'].map(axis=>obs.compile(prefix+`uniform vec3 P;void main(){float v=floor((sunDirection(V.w).${axis}*.5+.5)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`)),
+                obs.compile(prefix+`uniform vec3 P;void main(){float v=floor(flash(P)*65535.+.5);gl_FragColor=vec4(floor(v/256.)/255.,mod(v,256.)/255.,0,1);}`)];
   function sample(point,weather=false,seed=1,zoom=.025,time=0,kind=+weather){
    const prog=probes[kind];g.useProgram(prog);g.viewport(0,0,1,1);
    const uniform=n=>g.getUniformLocation(prog,n);
    g.uniform3fv(uniform('P'),point);g.uniform2f(uniform('R'),960,640);
    g.uniform2f(uniform('S'),seed&65535,seed>>>16);g.uniform4f(uniform('V'),0,0,zoom,time);
    g.drawArrays(g.TRIANGLES,0,3);const bytes=new Uint8Array(4);g.readPixels(0,0,1,1,g.RGBA,g.UNSIGNED_BYTE,bytes);
-   const value=(bytes[0]*256+bytes[1])/65535;return kind===0?value-.5:kind===2?(value-.5)/16:kind>=5?2*value-1:value;
+   const value=(bytes[0]*256+bytes[1])/65535;return kind===0?value-.5:kind===2?(value-.5)/16:kind>=5&&kind<=7?2*value-1:value;
   }
   const point=(x,y)=>[Math.sin(x)*Math.cos(y),Math.sin(y),Math.cos(x)*Math.cos(y)];
   const coords=[[.4,.3],[2.2,-.45],[-1,.6],[0,0],[3,-1],[1,1.3],[0,Math.PI/2],[0,-Math.PI/2]];
@@ -118,8 +119,9 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
   const materialTimes=[0,3,12,40].map(time=>({time,values:points.map(v=>sample(v,true,1,.025,time,4))}));
   const purelyAdvected=cloud,evolved=materialTimes[3].values;
   const suns=[0,40,400].map(time=>({time,vector:[5,6,7].map(kind=>sample([0,0,0],true,1,.025,time,kind))}));
+  const stormClocks=Array.from({length:120},(_,i)=>points.map(v=>sample(v,true,1,.025,i/5,8)));
   g.useProgram(obs.app);
-  return {suns,coords,ground,cloud,groundTime,groundReverse,cloudReverse,coarse,fine,cloudCoarse,cloudFine,seeds,weatherTimes,seam,poles,spatial,purelyAdvected,evolved,windRates,handoffs,materialTimes};
+  return {stormClocks,suns,coords,ground,cloud,groundTime,groundReverse,cloudReverse,coarse,fine,cloudCoarse,cloudFine,seeds,weatherTimes,seam,poles,spatial,purelyAdvected,evolved,windRates,handoffs,materialTimes};
  });
  assert.deepStrictEqual(field.ground,field.groundReverse);assert.deepStrictEqual(field.cloud,field.cloudReverse);
  assert(field.groundTime.every(values=>JSON.stringify(values)===JSON.stringify(field.ground)));
@@ -177,7 +179,10 @@ const engine=process.argv.includes('--webkit')?'webkit':'chromium';
   flashes.push({time,added_luminance:on.mean_luminance-off.mean_luminance});
  }
  assert(flashes.some(x=>x.added_luminance>0),'occasional night lightning must be visible');
- assert(flashes.some(x=>x.added_luminance<.00001),'lightning must turn off between flashes');
+ assert(Math.max(...flashes.map(x=>x.added_luminance))>2*Math.min(...flashes.map(x=>x.added_luminance)),'storm emission must vary with time');
+ const peaks=field.coords.map((_,i)=>field.stormClocks.reduce((best,row,t)=>row[i]>field.stormClocks[best][i]?t:best,0));
+ assert(new Set(peaks).size>=6,'separate storm cells must peak at independent times');
+ assert(field.stormClocks.some(row=>row.some(v=>v>.5)&&row.some(v=>v<.001)),'local flashes must coexist with unlit cells');
  const controls=await page.evaluate(()=>{
   planet(42,.4,.3,.025);onwheel({deltaY:-100});const wheel=[...draw(8)];
   document.querySelector('canvas').onpointermove({buttons:1,movementX:30,movementY:10});const drag=[...draw(9)];
